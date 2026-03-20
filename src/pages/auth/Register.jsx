@@ -23,8 +23,12 @@ export default function Register() {
     if (form.password.length < 6) return toast.error('Password must be at least 6 characters')
     setLoading(true)
     try {
-      await register(form.email, form.password, {
-        name: form.name, role: form.role, phone: form.phone
+      await register({
+        email: form.email,
+        password: form.password,
+        displayName: form.name,
+        role: form.role,
+        phone: form.phone,
       })
       toast.success(form.role === 'teacher'
         ? 'Registered! Await admin approval before login.'
@@ -33,7 +37,7 @@ export default function Register() {
     } catch (err) {
       const msg = err.code === 'auth/email-already-in-use' ? 'Email already registered'
         : err.code === 'auth/weak-password' ? 'Password is too weak'
-        : 'Registration failed. Try again.'
+          : 'Registration failed. Try again.'
       toast.error(msg)
     } finally {
       setLoading(false)
