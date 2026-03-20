@@ -1,0 +1,48 @@
+// storage.rules
+// Copy this into Firebase Console → Storage → Rules tab
+
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    function getUserRole() {
+      return firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isAdmin() {
+      return isAuth() && getUserRole() == 'admin';
+    }
+
+    function isTeacher() {
+      return isAuth() && getUserRole() == 'teacher';
+    }
+
+    // Course materials uploaded by teachers
+    match /materials/{userId}/{allPaths=**} {
+      allow read: if isAuth();
+      allow write: if isAuth() && (request.auth.uid == userId || isAdmin());
+    }
+
+    // Profile images
+    match /profiles/{userId}/{allPaths=**} {
+      allow read: if isAuth();
+      allow write: if isAuth() && request.auth.uid == userId;
+    }
+
+    // Admin uploads (challans, notices, etc.)
+    match /admin/{allPaths=**} {
+      allow read: if isAuth();
+      allow write: if isAdmin();
+    }
+
+    // Library books/PDFs
+    match /library/{allPaths=**} {
+      allow read: if isAuth();
+      allow write: if isAdmin();
+    }
+  }
+}

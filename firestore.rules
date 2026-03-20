@@ -1,0 +1,193 @@
+// firestore.rules
+// Copy this into Firebase Console → Firestore → Rules tab
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isRole(role) {
+      return isAuth() && getUserData().role == role;
+    }
+
+    function isAdmin() {
+      return isRole('admin');
+    }
+
+    function isTeacher() {
+      return isRole('teacher');
+    }
+
+    function isStudent() {
+      return isRole('student');
+    }
+
+    function isApprovedTeacher() {
+      return isTeacher() && getUserData().isApproved == true;
+    }
+
+    function isOwner(uid) {
+      return isAuth() && request.auth.uid == uid;
+    }
+
+    // ==================== USERS ====================
+    match /users/{userId} {
+      // Any authenticated user can read their own profile
+      allow read: if isOwner(userId) || isAdmin();
+      
+      // Anyone can create their own user doc (registration)
+      allow create: if isAuth() && isOwner(userId) && (
+        // Must be a student OR an unapproved teacher
+        (request.resource.data.role == 'student') ||
+        (request.resource.data.role == 'teacher' && request.resource.data.isApproved == false)
+      ) && !(request.resource.data.role == 'admin');
+
+      // Users can update own profile but NOT their role or approval status
+      allow update: if isAdmin() || (
+        isOwner(userId) && 
+        !request.resource.data.diff(resource.data).affectedKeys()
+          .hasAny(['role', 'isApproved', 'email'])
+      );
+
+      // Only admin can delete
+      allow delete: if isAdmin();
+    }
+
+    // ==================== DEPARTMENTS ====================
+    match /departments/{deptId} {
+      allow read: if isAuth();
+      allow write: if isAdmin();
+    }
+
+    // ==================== PROGRAMS ====================
+    match /programs/{progId} {
+      allow read: if isAuth();
+      allow write: if isAdmin();
+    }
+
+    // ==================== SETTINGS ====================
+    match /settings/{settingId} {
+      allow read: if isAuth();
+      allow write: if isAdmin();
+    }
+
+    // ==================== COURSES ====================
+    match /courses/{courseId} {
+      allow read: if isAuth();
+      allow create: if isAdmin();
+      allow update: if isAdmin() || isApprovedTeacher();
+      allow delete: if isAdmin();
+    }
+
+    // ==================== ATTENDANCE ====================
+    match /attendance/{attendanceId} {
+      // Students can read their own attendance
+      allow read: if isAuth() && (
+        resource.data.studentId == request.auth.uid ||
+        isAdmin() ||
+        isApprovedTeacher()
+      );
+      // Teachers can create/update attendance for their courses
+      allow create: if isApprovedTeacher() || isAdmin();
+      allow update: if isApprovedTeacher() || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ==================== RESULTS ====================
+    match /results/{resultId} {
+      // Students see their own results
+      allow read: if isAuth() && (
+        resource.data.studentId == request.auth.uid ||
+        isAdmin() ||
+        isApprovedTeacher()
+      );
+      allow create: if isApprovedTeacher() || isAdmin();
+      allow update: if isApprovedTeacher() || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ==================== CHALLANS ====================
+    match /challans/{challanId} {
+      // Students can read their own challans
+      allow read: if isAuth() && (
+        resource.data.studentId == request.auth.uid ||
+        isAdmin()
+      );
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ==================== NOTICES ====================
+    match /notices/{noticeId} {
+      // All authenticated users can read active notices
+      allow read: if isAuth();
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ==================== SCHOLARSHIPS ====================
+    match /scholarships/{scholarshipId} {
+      allow read: if isAuth();
+      allow write: if isAdmin();
+    }
+
+    // ==================== SCHOLARSHIP APPLICATIONS ====================
+    match /scholarshipApplications/{appId} {
+      allow read: if isAuth() && (
+        resource.data.studentId == request.auth.uid ||
+        isAdmin()
+      );
+      allow create: if isStudent();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ==================== TIMETABLE ====================
+    match /timetable/{slotId} {
+      allow read: if isAuth();
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ==================== ASSIGNMENTS ====================
+    match /assignments/{assignmentId} {
+      allow read: if isAuth();
+      allow create: if isApprovedTeacher() || isAdmin();
+      allow update: if isApprovedTeacher() || isAdmin();
+      allow delete: if isApprovedTeacher() || isAdmin();
+    }
+
+    // ==================== MATERIALS ====================
+    match /materials/{materialId} {
+      allow read: if isAuth();
+      allow create: if isApprovedTeacher() || isAdmin();
+      allow update: if isApprovedTeacher() || isAdmin();
+      allow delete: if isApprovedTeacher() || isAdmin();
+    }
+
+    // ==================== VIRTUAL CLASSES ====================
+    match /virtualClasses/{classId} {
+      allow read: if isAuth();
+      allow create: if isApprovedTeacher() || isAdmin();
+      allow update: if isApprovedTeacher() || isAdmin();
+      allow delete: if isApprovedTeacher() || isAdmin();
+    }
+
+    // ==================== LIBRARY ====================
+    match /library/{bookId} {
+      allow read: if isAuth();
+      allow write: if isAdmin();
+    }
+  }
+}
