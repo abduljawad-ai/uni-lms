@@ -25,7 +25,7 @@ export default function AdminDashboard() {
         setStats({ students:students.size, teachers:teachers.size, courses:courses.size, departments:depts.size, challans:challans.size, notices:notices.size })
         const deptMap = {}
         students.docs.forEach(d => {
-          const dep = d.data().departmentName
+          const dep = d.data().departmentNameName
           if (dep) { deptMap[dep] = (deptMap[dep] || 0) + 1 }
         })
         setDeptData(Object.entries(deptMap).map(([name,count])=>({name:name.length>20?name.slice(0,20)+'...':name, count})).sort((a,b)=>b.count-a.count).slice(0,6))

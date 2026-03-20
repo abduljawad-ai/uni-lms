@@ -12,7 +12,7 @@ export default function AdminEnrollments() {
   useEffect(() => {
     const fetch = async () => {
       try {
-        const snap = await getDocs(query(collection(db,'users'), where('role','==','student'), where('isEnrolled','==',true)))
+        const snap = await getDocs(query(collection(db,'users'), where('role','==','student'), where('enrollmentStatus','==','APPROVED')))
         setStudents(snap.docs.map(d=>({id:d.id,...d.data()})))
       } catch {} finally { setLoading(false) }
     }

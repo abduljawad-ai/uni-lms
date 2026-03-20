@@ -43,7 +43,7 @@ export default function StudentDashboard() {
       try {
         const [cSnap, nSnap] = await Promise.all([
           getDocs(query(collection(db,'challans'), where('studentId','==',userProfile.uid), orderBy('createdAt','desc'), limit(5))),
-          getDocs(query(collection(db,'notices'), where('isActive','==',true), orderBy('createdAt','desc'), limit(3)))
+          getDocs(query(collection(db,'notifications'), where('isActive','==',true), orderBy('createdAt','desc'), limit(3)))
         ])
         setChallans(cSnap.docs.map(d => ({ id:d.id, ...d.data() })))
         setNotices(nSnap.docs.map(d => ({ id:d.id, ...d.data() })))

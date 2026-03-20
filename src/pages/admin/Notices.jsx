@@ -15,7 +15,7 @@ export default function AdminNotices() {
   useEffect(() => {
     const fetch = async () => {
       try {
-        const snap = await getDocs(query(collection(db,'notices'), orderBy('createdAt','desc')))
+        const snap = await getDocs(query(collection(db,'notifications'), orderBy('createdAt','desc')))
         setNotices(snap.docs.map(d=>({id:d.id,...d.data()})))
       } catch {} finally { setLoading(false) }
     }
@@ -29,7 +29,7 @@ export default function AdminNotices() {
     if (!form.title || !form.content) return toast.error('Fill required fields')
     setSaving(true)
     try {
-      const ref = await addDoc(collection(db,'notices'), { ...form, isActive:true, postedBy:'Admin', createdAt: serverTimestamp() })
+      const ref = await addDoc(collection(db,'notifications'), { ...form, isActive:true, postedBy:'Admin', createdAt: serverTimestamp() })
       setNotices(p=>[{id:ref.id,...form,isActive:true,postedBy:'Admin'},...p])
       setShowForm(false); setForm({title:'',content:'',type:'general',targetRole:'all'})
       toast.success('Notice posted!')

@@ -20,7 +20,7 @@ export default function AdminChallans() {
       try {
         const [cSnap, sSnap] = await Promise.all([
           getDocs(collection(db,'challans')),
-          getDocs(query(collection(db,'users'), where('role','==','student'), where('isEnrolled','==',true)))
+          getDocs(query(collection(db,'users'), where('role','==','student'), where('enrollmentStatus','==','APPROVED')))
         ])
         setChallans(cSnap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)))
         setStudents(sSnap.docs.map(d=>({id:d.id,...d.data()})))

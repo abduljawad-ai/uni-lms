@@ -19,7 +19,7 @@ export default function StudentNotices() {
   useEffect(() => {
     const fetch = async () => {
       try {
-        const snap = await getDocs(query(collection(db,'notices'), where('isActive','==',true), orderBy('createdAt','desc')))
+        const snap = await getDocs(query(collection(db,'notifications'), where('isActive','==',true), orderBy('createdAt','desc')))
         setNotices(snap.docs.map(d=>({id:d.id,...d.data()})))
       } catch {} finally { setLoading(false) }
     }
