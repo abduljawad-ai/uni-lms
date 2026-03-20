@@ -78,7 +78,7 @@ export default function StudentLayout() {
         <div className="flex items-center justify-between p-4 border-b border-white/10 flex-shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm overflow-hidden">
-              <img src="/images/logo.png" alt="UniPortal Logo" className="w-full h-full object-cover" />
+              <img src={`${import.meta.env.BASE_URL}images/logo.png`} alt="UniPortal Logo" className="w-full h-full object-cover" />
             </div>
             <div>
               <div className="text-white font-bold text-sm leading-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>UniPortal</div>

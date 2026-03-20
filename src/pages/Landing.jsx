@@ -11,7 +11,7 @@ export default function Landing() {
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm overflow-hidden">
-                <img src="/images/logo.png" alt="UniPortal Logo" className="w-full h-full object-cover" />
+                <img src={`${import.meta.env.BASE_URL}images/logo.png`} alt="UniPortal Logo" className="w-full h-full object-cover" />
               </div>
               <div>
                 <div className="text-[#1e3a5f] font-bold text-xl" style={{ fontFamily: 'Outfit, sans-serif' }}>UniPortal</div>
@@ -64,7 +64,7 @@ export default function Landing() {
             </div>
             <div className="lg:w-1/2 relative">
               <div className="relative rounded-[2rem] overflow-hidden shadow-2xl shadow-blue-900/20 group">
-                <img src="/images/hero.png" alt="University Campus" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                <img src={`${import.meta.env.BASE_URL}images/hero.png`} alt="University Campus" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#1e3a5f]/40 to-transparent"></div>
               </div>
               {/* Floating Cards */}
@@ -125,7 +125,7 @@ export default function Landing() {
             {/* Student Portal */}
             <div className="group bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300">
               <div className="aspect-video rounded-2xl overflow-hidden mb-8">
-                <img src="/images/student.png" alt="Student Portal" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                <img src={`${import.meta.env.BASE_URL}images/student.png`} alt="Student Portal" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
               </div>
               <div className="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-6">
                 <GraduationCap className="w-7 h-7" />
@@ -146,7 +146,7 @@ export default function Landing() {
             {/* Teacher Portal */}
             <div className="group bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300">
               <div className="aspect-video rounded-2xl overflow-hidden mb-8">
-                <img src="/images/teacher.png" alt="Teacher Portal" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                <img src={`${import.meta.env.BASE_URL}images/teacher.png`} alt="Teacher Portal" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
               </div>
               <div className="w-14 h-14 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center mb-6">
                 <BookOpen className="w-7 h-7" />
@@ -167,7 +167,7 @@ export default function Landing() {
             {/* Admin Panel */}
             <div className="group bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300">
               <div className="aspect-video rounded-2xl overflow-hidden mb-8">
-                <img src="/images/library.png" alt="Admin Panel" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                <img src={`${import.meta.env.BASE_URL}images/library.png`} alt="Admin Panel" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
               </div>
               <div className="w-14 h-14 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center mb-6">
                 <Shield className="w-7 h-7" />
@@ -225,7 +225,7 @@ export default function Landing() {
             <div className="col-span-2">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm overflow-hidden">
-                  <img src="/images/logo.png" alt="UniPortal Logo" className="w-full h-full object-cover" />
+                  <img src={`${import.meta.env.BASE_URL}images/logo.png`} alt="UniPortal Logo" className="w-full h-full object-cover" />
                 </div>
                 <div>
                   <div className="text-[#1e3a5f] font-bold text-xl" style={{ fontFamily: 'Outfit, sans-serif' }}>UniPortal</div>

@@ -46,13 +46,13 @@ export default function Register() {
       <div className="hidden lg:flex lg:w-1/2 bg-[#1e3a5f] relative overflow-hidden items-center justify-center p-12">
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0">
-          <img src="/images/auth-side.png" alt="University Hallway" className="w-full h-full object-cover opacity-40" />
+          <img src={`${import.meta.env.BASE_URL}images/auth-side.png`} alt="University Hallway" className="w-full h-full object-cover opacity-40" />
           <div className="absolute inset-0 bg-gradient-to-br from-[#1e3a5f] via-[#1e3a5f]/80 to-transparent"></div>
         </div>
         <div className="relative z-10 w-full max-w-lg">
           <div className="flex items-center gap-3 mb-16">
             <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg overflow-hidden">
-              <img src="/images/logo.png" alt="UniPortal Logo" className="w-full h-full object-cover" />
+              <img src={`${import.meta.env.BASE_URL}images/logo.png`} alt="UniPortal Logo" className="w-full h-full object-cover" />
             </div>
             <div>
               <div className="text-white font-bold text-xl" style={{ fontFamily: 'Outfit, sans-serif' }}>UniPortal</div>
@@ -85,7 +85,7 @@ export default function Register() {
       </div>
 
       {/* Right Panel */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 bg-cover bg-center bg-no-repeat bg-gray-50 overflow-y-auto" style={{ backgroundImage: "url('/images/auth-bg.png')" }}>
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 bg-cover bg-center bg-no-repeat bg-gray-50 overflow-y-auto" style={{ backgroundImage: `url('${import.meta.env.BASE_URL}images/auth-bg.png')` }}>
         <div className="w-full max-w-md py-12">
           {/* Mobile Logo */}
           <div className="flex lg:hidden items-center gap-3 justify-center mb-8">
