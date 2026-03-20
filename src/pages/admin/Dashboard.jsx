@@ -15,16 +15,19 @@ export default function AdminDashboard() {
     const fetchStats = async () => {
       try {
         const [students, teachers, courses, depts, challans, notices] = await Promise.all([
-          getDocs(query(collection(db,'users'), where('role','==','student'))),
-          getDocs(query(collection(db,'users'), where('role','==','teacher'))),
+          getDocs(query(collection(db,'users'), where('role','==','student'), where('enrollmentStatus','==','APPROVED'))),
+          getDocs(query(collection(db,'users'), where('role','==','teacher'), where('isApproved','==',true))),
           getDocs(collection(db,'courses')),
           getDocs(collection(db,'departments')),
           getDocs(collection(db,'challans')),
-          getDocs(query(collection(db,'notices'), where('isActive','==',true))),
+          getDocs(query(collection(db,'notifications'), where('isActive','==',true))),
         ])
         setStats({ students:students.size, teachers:teachers.size, courses:courses.size, departments:depts.size, challans:challans.size, notices:notices.size })
         const deptMap = {}
-        students.docs.forEach(d=>{ const dep = d.data().department; if(dep){ deptMap[dep]=(deptMap[dep]||0)+1 } })
+        students.docs.forEach(d => {
+          const dep = d.data().departmentName
+          if (dep) { deptMap[dep] = (deptMap[dep] || 0) + 1 }
+        })
         setDeptData(Object.entries(deptMap).map(([name,count])=>({name:name.length>20?name.slice(0,20)+'...':name, count})).sort((a,b)=>b.count-a.count).slice(0,6))
       } catch(e){console.error(e)} finally { setLoading(false) }
     }
