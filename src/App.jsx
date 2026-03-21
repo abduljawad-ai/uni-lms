@@ -61,17 +61,26 @@ import AdminProfile from './pages/admin/Profile'
 import AdminSettings from './pages/admin/Settings'
 
 const PrivateRoute = ({ children, allowedRoles }) => {
-  const { currentUser, userProfile } = useAuth()
+  const { currentUser, userProfile, loading } = useAuth()
+  
+  if (loading) return (
+    <div className="flex items-center justify-center h-screen">
+      <div className="w-8 h-8 border-4 border-[#1e3a5f]/20 border-t-[#1e3a5f] rounded-full animate-spin"></div>
+    </div>
+  )
+  
   if (!currentUser) return <Navigate to="/login" replace />
   if (allowedRoles && !allowedRoles.includes(userProfile?.role)) return <Navigate to="/login" replace />
 
-  // Students who are not approved can only access enrollment page
-  if (userProfile?.role === 'student' && userProfile?.enrollmentStatus !== 'APPROVED') {
-    const path = window.location.pathname
-    if (!path.includes('/student/enrollment')) {
-      return <Navigate to="/student/enrollment" replace />
-    }
+  // Students not yet approved can only see enrollment page
+  if (
+    userProfile?.role === 'student' &&
+    userProfile?.enrollmentStatus !== 'APPROVED' &&
+    window.location.pathname !== '/uni-lms/student/enrollment'
+  ) {
+    return <Navigate to="/student/enrollment" replace />
   }
+
   return children
 }
 
