@@ -1,193 +1,503 @@
-// firestore.rules
-// Copy this into Firebase Console → Firestore → Rules tab
-
+//these are the rules pasted in firebase consule rules
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions
+    // ─────────────────────────────────────────────
+    //  HELPER FUNCTIONS
+    // ─────────────────────────────────────────────
+
+    // Is the request authenticated at all?
     function isAuth() {
       return request.auth != null;
     }
 
-    function getUserData() {
+    // Read the caller's user document (cached single read per request)
+    function me() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
     }
 
-    function isRole(role) {
-      return isAuth() && getUserData().role == role;
-    }
+    // Role checks
+    function isAdmin()   { return isAuth() && me().role == 'admin'; }
+    function isTeacher() { return isAuth() && me().role == 'teacher'; }
+    function isStudent() { return isAuth() && me().role == 'student'; }
 
-    function isAdmin() {
-      return isRole('admin');
-    }
-
-    function isTeacher() {
-      return isRole('teacher');
-    }
-
-    function isStudent() {
-      return isRole('student');
-    }
-
+    // Teacher must be explicitly approved by admin
     function isApprovedTeacher() {
-      return isTeacher() && getUserData().isApproved == true;
+      return isTeacher() && me().isApproved == true;
     }
 
+    // Student must have completed enrollment AND been approved
+    function isApprovedStudent() {
+      return isStudent() && me().enrollmentStatus == 'APPROVED';
+    }
+
+    // Is the caller the document owner?
     function isOwner(uid) {
       return isAuth() && request.auth.uid == uid;
     }
 
-    // ==================== USERS ====================
+    // Does the incoming write try to change protected fields?
+    function touchesProtectedField(fields) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
+    }
+
+    // Does a teacher own a specific course?
+    // Reads the course doc to verify teacherId matches caller
+    function teacherOwnsCourse(courseId) {
+      return get(/databases/$(database)/documents/courses/$(courseId)).data.teacherId
+             == request.auth.uid;
+    }
+
+    // Does the student's enrollment match the notification target?
+    // Used when reading notifications — student sees only their cohort's notices
+    function studentMatchesTarget(notifData) {
+      let enrollment = me();
+      return
+        notifData.targetDepartmentId == enrollment.departmentId &&
+        (notifData.targetYear == null || notifData.targetYear == enrollment.currentYear) &&
+        (notifData.targetSemesterId == null || notifData.targetSemesterId == enrollment.currentSemesterId);
+    }
+
+    // ─────────────────────────────────────────────
+    //  USERS
+    //  Schema:
+    //    uid, email, displayName, role (admin|teacher|student),
+    //    isApproved (teachers), enrollmentStatus (students: NONE|PENDING|APPROVED|REJECTED),
+    //    departmentId, programId, batchYear, currentYear, currentSemesterId,
+    //    rollNumber, createdAt
+    // ─────────────────────────────────────────────
     match /users/{userId} {
-      // Any authenticated user can read their own profile
+
+      // Users read own profile; admin reads any profile
       allow read: if isOwner(userId) || isAdmin();
-      
-      // Anyone can create their own user doc (registration)
-      allow create: if isAuth() && isOwner(userId) && (
-        // Must be a student OR an unapproved teacher
-        (request.resource.data.role == 'student') ||
-        (request.resource.data.role == 'teacher' && request.resource.data.isApproved == false)
-      ) && !(request.resource.data.role == 'admin');
 
-      // Users can update own profile but NOT their role or approval status
-      allow update: if isAdmin() || (
-        isOwner(userId) && 
-        !request.resource.data.diff(resource.data).affectedKeys()
-          .hasAny(['role', 'isApproved', 'email'])
-      );
+      // Registration — anyone authenticated can create their own doc
+      // Students start with enrollmentStatus=NONE, teachers with isApproved=false
+      // NOBODY can self-register as admin
+      allow create: if isAuth() && isOwner(userId)
+        && request.resource.data.role != 'admin'
+        && (
+          (request.resource.data.role == 'student'
+            && request.resource.data.enrollmentStatus == 'NONE')
+          ||
+          (request.resource.data.role == 'teacher'
+            && request.resource.data.isApproved == false)
+        );
 
-      // Only admin can delete
+      // Profile update — users can update safe fields only
+      // Admin can update anything (approvals, semester changes, etc.)
+      // Students can update enrollment-related fields (including status/program/batch/year)
+      allow update: if isAdmin()
+        || (
+          isOwner(userId)
+          && !touchesProtectedField([
+              'role', 'isApproved', 'email'
+            ])
+        );
+
+      // Only admin deletes accounts
       allow delete: if isAdmin();
     }
 
-    // ==================== DEPARTMENTS ====================
+    // Admin-only list of all users (for the teacher management panel)
+    // Individual reads handled above
+    match /users/{userId} {
+      allow list: if isAdmin()
+        || (isApprovedTeacher() && resource.data.role == 'student');
+    }
+
+    // ─────────────────────────────────────────────
+    //  ENROLLMENT REQUESTS
+    //  Separate collection — keeps enrollment lifecycle
+    //  out of the users doc for clean auditing
+    //  Schema:
+    //    studentId, departmentId, programId, batchYear,
+    //    status (PENDING|APPROVED|REJECTED),
+    //    submittedAt, reviewedAt, reviewedBy, rejectionReason
+    // ─────────────────────────────────────────────
+    match /enrollmentRequests/{reqId} {
+
+      // Student reads own request; admin reads all
+      allow read: if isAuth() && (
+        resource.data.studentId == request.auth.uid || isAdmin()
+      );
+
+      // Student submits enrollment — status must be PENDING
+      // One enrollment per student enforced via app logic + unique index
+      allow create: if isStudent()
+        && request.resource.data.studentId == request.auth.uid
+        && request.resource.data.status == 'PENDING'
+        && me().enrollmentStatus == 'NONE';
+
+      // Only admin approves / rejects
+      allow update: if isAdmin();
+
+      allow delete: if isAdmin();
+    }
+
+    // ─────────────────────────────────────────────
+    //  DEPARTMENTS
+    //  Schema: id, name, code, headOfDept, createdAt
+    // ─────────────────────────────────────────────
     match /departments/{deptId} {
-      allow read: if isAuth();
+      allow read:  if isAuth();
       allow write: if isAdmin();
     }
 
-    // ==================== PROGRAMS ====================
+    // ─────────────────────────────────────────────
+    //  PROGRAMS
+    //  Schema: id, name, durationYears, departmentId, totalSemesters
+    // ─────────────────────────────────────────────
     match /programs/{progId} {
-      allow read: if isAuth();
+      allow read:  if isAuth();
       allow write: if isAdmin();
     }
 
-    // ==================== SETTINGS ====================
-    match /settings/{settingId} {
-      allow read: if isAuth();
+    // ─────────────────────────────────────────────
+    //  SEMESTERS
+    //  Schema: id, label (e.g. "Fall 2025"), startDate, endDate,
+    //          isActive, registrationOpen, examPeriodOpen
+    // ─────────────────────────────────────────────
+    match /semesters/{semId} {
+      allow read:  if isAuth();
       allow write: if isAdmin();
     }
 
-    // ==================== COURSES ====================
+    // ─────────────────────────────────────────────
+    //  COURSES (Subjects)
+    //  Schema: id, name, code, creditHours, departmentId,
+    //          programId, semesterId, semesterNumber (1-8),
+    //          teacherId, maxStudents, isActive
+    // ─────────────────────────────────────────────
     match /courses/{courseId} {
       allow read: if isAuth();
+
       allow create: if isAdmin();
-      allow update: if isAdmin() || isApprovedTeacher();
+
+      // Admin updates anything; teacher updates ONLY their own course
+      // and cannot reassign teacherId or change department/program
+      allow update: if isAdmin()
+        || (
+          isApprovedTeacher()
+          && resource.data.teacherId == request.auth.uid
+          && !touchesProtectedField([
+              'teacherId', 'departmentId', 'programId',
+              'semesterId', 'creditHours'
+            ])
+        );
+
       allow delete: if isAdmin();
     }
 
-    // ==================== ATTENDANCE ====================
-    match /attendance/{attendanceId} {
-      // Students can read their own attendance
+    // ─────────────────────────────────────────────
+    //  COURSE ENROLLMENTS
+    //  Links approved students to specific courses
+    //  Schema: id, studentId, courseId, departmentId,
+    //          semesterId, enrolledAt, grade, isActive
+    // ─────────────────────────────────────────────
+    match /courseEnrollments/{enrollId} {
+
       allow read: if isAuth() && (
-        resource.data.studentId == request.auth.uid ||
-        isAdmin() ||
-        isApprovedTeacher()
+        resource.data.studentId == request.auth.uid
+        || isAdmin()
+        || (isApprovedTeacher() && teacherOwnsCourse(resource.data.courseId))
       );
-      // Teachers can create/update attendance for their courses
-      allow create: if isApprovedTeacher() || isAdmin();
-      allow update: if isApprovedTeacher() || isAdmin();
+
+      // Only admin (or a Cloud Function) links students to courses
+      allow create: if isAdmin();
+      allow update: if isAdmin()
+        || (isApprovedTeacher() && teacherOwnsCourse(resource.data.courseId));
       allow delete: if isAdmin();
     }
 
-    // ==================== RESULTS ====================
+    // ─────────────────────────────────────────────
+    //  ATTENDANCE
+    //  Schema: id, courseId, studentId, teacherId,
+    //          date, status (PRESENT|ABSENT|LEAVE|LATE),
+    //          departmentId, semesterId, markedAt
+    // ─────────────────────────────────────────────
+    match /attendance/{attId} {
+
+      allow read: if isAuth() && (
+        resource.data.studentId == request.auth.uid
+        || isAdmin()
+        || (isApprovedTeacher() && resource.data.teacherId == request.auth.uid)
+      );
+
+      // Teacher creates attendance ONLY for their own course
+      allow create: if isAdmin()
+        || (
+          isApprovedTeacher()
+          && request.resource.data.teacherId == request.auth.uid
+          && teacherOwnsCourse(request.resource.data.courseId)
+        );
+
+      // Same constraint on update
+      allow update: if isAdmin()
+        || (
+          isApprovedTeacher()
+          && resource.data.teacherId == request.auth.uid
+        );
+
+      allow delete: if isAdmin();
+    }
+
+    // ─────────────────────────────────────────────
+    //  RESULTS / MARKS
+    //  Schema: id, courseId, studentId, teacherId,
+    //          semesterId, departmentId,
+    //          attendanceMarks (max 10), assignmentMarks (max 10),
+    //          midMarks (max 30), finalMarks (max 50),
+    //          totalMarks (computed), grade, isPublished,
+    //          enteredAt, publishedAt
+    // ─────────────────────────────────────────────
     match /results/{resultId} {
-      // Students see their own results
-      allow read: if isAuth() && (
-        resource.data.studentId == request.auth.uid ||
-        isAdmin() ||
-        isApprovedTeacher()
-      );
-      allow create: if isApprovedTeacher() || isAdmin();
-      allow update: if isApprovedTeacher() || isAdmin();
+
+      // Students only see published results for their own courses
+      allow read: if isAdmin()
+        || (isApprovedTeacher() && resource.data.teacherId == request.auth.uid)
+        || (
+          isApprovedStudent()
+          && resource.data.studentId == request.auth.uid
+          && resource.data.isPublished == true
+        );
+
+      // Teacher enters marks for their own course with validated ranges
+      allow create: if isAdmin()
+        || (
+          isApprovedTeacher()
+          && request.resource.data.teacherId == request.auth.uid
+          && teacherOwnsCourse(request.resource.data.courseId)
+          && request.resource.data.attendanceMarks <= 10
+          && request.resource.data.assignmentMarks <= 10
+          && request.resource.data.midMarks        <= 30
+          && request.resource.data.finalMarks      <= 50
+          && request.resource.data.isPublished     == false
+        );
+
+      // Teacher updates marks; admin publishes
+      allow update: if isAdmin()
+        || (
+          isApprovedTeacher()
+          && resource.data.teacherId == request.auth.uid
+          && !touchesProtectedField(['isPublished', 'publishedAt'])
+          && request.resource.data.attendanceMarks <= 10
+          && request.resource.data.assignmentMarks <= 10
+          && request.resource.data.midMarks        <= 30
+          && request.resource.data.finalMarks      <= 50
+        );
+
       allow delete: if isAdmin();
     }
 
-    // ==================== CHALLANS ====================
+    // ─────────────────────────────────────────────
+    //  NOTIFICATIONS
+    //  Schema: id, title, body, type (INFO|EXAM|FEE|URGENT),
+    //          createdBy, createdByRole,
+    //          targetDepartmentId (required),
+    //          targetYear (null = all years),
+    //          targetSemesterId (null = all semesters),
+    //          isActive, createdAt
+    //
+    //  Read rule: student's dept/year/semester must match target
+    // ─────────────────────────────────────────────
+    match /notifications/{notifId} {
+
+      allow read: if isAdmin()
+        || isApprovedTeacher()
+        || (isApprovedStudent() && studentMatchesTarget(resource.data));
+
+      allow create: if isAdmin()
+        || (
+          isApprovedTeacher()
+          && request.resource.data.createdBy == request.auth.uid
+          // Teacher can only notify their own department
+          && request.resource.data.targetDepartmentId == me().departmentId
+        );
+
+      allow update: if isAdmin()
+        || (isApprovedTeacher() && resource.data.createdBy == request.auth.uid);
+
+      allow delete: if isAdmin();
+    }
+
+    // ─────────────────────────────────────────────
+    //  CHALLANS (Fee Vouchers)
+    //  Schema: id, challanNumber, studentId,
+    //          departmentId, programId, batchYear, semesterId,
+    //          amount, dueDate, issueDate,
+    //          status (UNPAID|PAID|OVERDUE|CANCELLED),
+    //          paidAt, paymentRef, isActive,
+    //          -- bulk generation metadata --
+    //          bulkGenerationId (links to a bulk job),
+    //          generatedBy (admin uid)
+    // ─────────────────────────────────────────────
     match /challans/{challanId} {
-      // Students can read their own challans
-      allow read: if isAuth() && (
-        resource.data.studentId == request.auth.uid ||
-        isAdmin()
-      );
+
+      allow read: if isAdmin()
+        || (
+          isAuth()
+          && resource.data.studentId == request.auth.uid
+        );
+
+      // Only admin generates challans (bulk or individual)
       allow create: if isAdmin();
       allow update: if isAdmin();
       allow delete: if isAdmin();
     }
 
-    // ==================== NOTICES ====================
-    match /notices/{noticeId} {
-      // All authenticated users can read active notices
-      allow read: if isAuth();
+    // ─────────────────────────────────────────────
+    //  CHALLAN BULK JOBS
+    //  Tracks a bulk generation run for auditability
+    //  Schema: id, targetDepartmentId, targetYear,
+    //          targetSemesterId, programId,
+    //          amount, dueDate, studentsTargeted,
+    //          studentsReached, status (PENDING|COMPLETE|FAILED),
+    //          createdBy, createdAt, completedAt
+    // ─────────────────────────────────────────────
+    match /challanBulkJobs/{jobId} {
+      allow read:   if isAdmin();
       allow create: if isAdmin();
       allow update: if isAdmin();
       allow delete: if isAdmin();
     }
 
-    // ==================== SCHOLARSHIPS ====================
-    match /scholarships/{scholarshipId} {
+    // ─────────────────────────────────────────────
+    //  ASSIGNMENTS
+    //  Schema: id, courseId, teacherId, departmentId,
+    //          semesterId, title, description, dueDate,
+    //          totalMarks, attachmentUrl, isActive, createdAt
+    // ─────────────────────────────────────────────
+    match /assignments/{assignId} {
+
       allow read: if isAuth();
+
+      allow create: if isAdmin()
+        || (isApprovedTeacher() && request.resource.data.teacherId == request.auth.uid
+            && teacherOwnsCourse(request.resource.data.courseId));
+
+      allow update: if isAdmin()
+        || (isApprovedTeacher() && resource.data.teacherId == request.auth.uid);
+
+      allow delete: if isAdmin()
+        || (isApprovedTeacher() && resource.data.teacherId == request.auth.uid);
+    }
+
+    // ─────────────────────────────────────────────
+    //  ASSIGNMENT SUBMISSIONS
+    //  Schema: id, assignmentId, studentId, courseId,
+    //          submittedAt, fileUrl, marks, feedback,
+    //          isLate, isGraded
+    // ─────────────────────────────────────────────
+    match /assignmentSubmissions/{subId} {
+
+      allow read: if isAdmin()
+        || (isApprovedTeacher() && teacherOwnsCourse(resource.data.courseId))
+        || (isApprovedStudent() && resource.data.studentId == request.auth.uid);
+
+      allow create: if isApprovedStudent()
+        && request.resource.data.studentId == request.auth.uid;
+
+      allow update: if isAdmin()
+        || (isApprovedTeacher() && teacherOwnsCourse(resource.data.courseId))
+        || (isApprovedStudent() && resource.data.studentId == request.auth.uid
+            && !touchesProtectedField(['marks', 'feedback', 'isGraded']));
+
+      allow delete: if isAdmin();
+    }
+
+    // ─────────────────────────────────────────────
+    //  COURSE MATERIALS
+    //  Schema: id, courseId, teacherId, title,
+    //          type (PDF|VIDEO|SLIDE|LINK),
+    //          fileUrl, uploadedAt, isActive
+    // ─────────────────────────────────────────────
+    match /materials/{matId} {
+      allow read: if isAuth();
+      allow create: if isAdmin()
+        || (isApprovedTeacher() && request.resource.data.teacherId == request.auth.uid
+            && teacherOwnsCourse(request.resource.data.courseId));
+      allow update: if isAdmin()
+        || (isApprovedTeacher() && resource.data.teacherId == request.auth.uid);
+      allow delete: if isAdmin()
+        || (isApprovedTeacher() && resource.data.teacherId == request.auth.uid);
+    }
+
+    // ─────────────────────────────────────────────
+    //  TIMETABLE
+    //  Schema: id, courseId, departmentId, programId,
+    //          semesterId, semesterNumber, dayOfWeek,
+    //          startTime, endTime, room, teacherId
+    // ─────────────────────────────────────────────
+    match /timetable/{slotId} {
+      allow read:  if isAuth();
       allow write: if isAdmin();
     }
 
-    // ==================== SCHOLARSHIP APPLICATIONS ====================
+    // ─────────────────────────────────────────────
+    //  SCHOLARSHIPS
+    //  Schema: id, title, provider, description,
+    //          eligibility, amount, deadline,
+    //          applicationUrl, isActive, createdAt
+    // ─────────────────────────────────────────────
+    match /scholarships/{schId} {
+      allow read:  if isAuth();
+      allow write: if isAdmin();
+    }
+
+    // ─────────────────────────────────────────────
+    //  SCHOLARSHIP APPLICATIONS
+    //  Schema: id, scholarshipId, studentId,
+    //          statement, submittedAt, status
+    // ─────────────────────────────────────────────
     match /scholarshipApplications/{appId} {
-      allow read: if isAuth() && (
-        resource.data.studentId == request.auth.uid ||
-        isAdmin()
-      );
-      allow create: if isStudent();
+      allow read: if isAdmin()
+        || (isApprovedStudent() && resource.data.studentId == request.auth.uid);
+      allow create: if isApprovedStudent()
+        && request.resource.data.studentId == request.auth.uid;
       allow update: if isAdmin();
       allow delete: if isAdmin();
     }
 
-    // ==================== TIMETABLE ====================
-    match /timetable/{slotId} {
-      allow read: if isAuth();
-      allow create: if isAdmin();
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
+    // ─────────────────────────────────────────────
+    //  LIBRARY
+    //  Schema: id, title, author, subject, fileUrl,
+    //          departmentId (null = university-wide),
+    //          uploadedAt, isActive
+    // ─────────────────────────────────────────────
+    match /library/{bookId} {
+      allow read:  if isAuth();
+      allow write: if isAdmin();
     }
 
-    // ==================== ASSIGNMENTS ====================
-    match /assignments/{assignmentId} {
-      allow read: if isAuth();
-      allow create: if isApprovedTeacher() || isAdmin();
-      allow update: if isApprovedTeacher() || isAdmin();
-      allow delete: if isApprovedTeacher() || isAdmin();
+    // ─────────────────────────────────────────────
+    //  SETTINGS  (university-wide config)
+    //  Schema: id (fixed "main"), universityName, logo,
+    //          academicYear, semesterStartDate, semesterEndDate,
+    //          registrationOpen, maintenanceMode, contactEmail
+    // ─────────────────────────────────────────────
+    match /settings/{settingId} {
+      allow read:  if isAuth();
+      allow write: if isAdmin();
     }
 
-    // ==================== MATERIALS ====================
-    match /materials/{materialId} {
-      allow read: if isAuth();
-      allow create: if isApprovedTeacher() || isAdmin();
-      allow update: if isApprovedTeacher() || isAdmin();
-      allow delete: if isApprovedTeacher() || isAdmin();
-    }
-
-    // ==================== VIRTUAL CLASSES ====================
+    // ─────────────────────────────────────────────
+    //  VIRTUAL CLASSES
+    //  Schema: id, courseId, teacherId, title,
+    //          meetLink, scheduledAt, isRecorded,
+    //          recordingUrl, isActive
+    // ─────────────────────────────────────────────
     match /virtualClasses/{classId} {
       allow read: if isAuth();
-      allow create: if isApprovedTeacher() || isAdmin();
-      allow update: if isApprovedTeacher() || isAdmin();
-      allow delete: if isApprovedTeacher() || isAdmin();
+      allow create: if isAdmin()
+        || (isApprovedTeacher() && request.resource.data.teacherId == request.auth.uid
+            && teacherOwnsCourse(request.resource.data.courseId));
+      allow update: if isAdmin()
+        || (isApprovedTeacher() && resource.data.teacherId == request.auth.uid);
+      allow delete: if isAdmin()
+        || (isApprovedTeacher() && resource.data.teacherId == request.auth.uid);
     }
 
-    // ==================== LIBRARY ====================
-    match /library/{bookId} {
-      allow read: if isAuth();
-      allow write: if isAdmin();
-    }
-  }
-}
+  } // end match /databases
+} // end service
