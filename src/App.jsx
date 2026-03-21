@@ -1,5 +1,5 @@
 // src/App.jsx
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from './contexts/AuthContext'
 
 import Login from './pages/auth/Login'
@@ -62,6 +62,7 @@ import AdminSettings from './pages/admin/Settings'
 
 const PrivateRoute = ({ children, allowedRoles }) => {
   const { currentUser, userProfile, loading } = useAuth()
+  const location = useLocation()
   
   if (loading) return (
     <div className="flex items-center justify-center h-screen">
@@ -69,17 +70,8 @@ const PrivateRoute = ({ children, allowedRoles }) => {
     </div>
   )
   
-  if (!currentUser) return <Navigate to="/login" replace />
+  if (!currentUser) return <Navigate to="/login" state={{ from: location }} replace />
   if (allowedRoles && !allowedRoles.includes(userProfile?.role)) return <Navigate to="/login" replace />
-
-  // Students not yet approved can only see enrollment page
-  if (
-    userProfile?.role === 'student' &&
-    userProfile?.enrollmentStatus !== 'APPROVED' &&
-    window.location.pathname !== '/uni-lms/student/enrollment'
-  ) {
-    return <Navigate to="/student/enrollment" replace />
-  }
 
   return children
 }
