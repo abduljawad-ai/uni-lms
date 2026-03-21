@@ -1,4 +1,4 @@
-// src/pages/student/Profile.jsx
+
 import { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import toast from 'react-hot-toast'
@@ -48,7 +48,7 @@ export default function StudentProfile() {
     <div className="space-y-6 animate-fade-in max-w-2xl">
       <h1 className="text-2xl font-bold text-[#1e3a5f]" style={{fontFamily:'Outfit,sans-serif'}}>My Profile</h1>
 
-      {/* Avatar + Basic Info */}
+      {}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <div className="flex items-start gap-6 flex-wrap">
           <div className="relative">
@@ -73,7 +73,7 @@ export default function StudentProfile() {
         </div>
       </div>
 
-      {/* Edit Profile */}
+      {}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <h3 className="font-bold text-gray-800 mb-5" style={{fontFamily:'Outfit,sans-serif'}}>Edit Profile</h3>
         <form onSubmit={handleProfileSave} className="space-y-4">
@@ -104,7 +104,7 @@ export default function StudentProfile() {
         </form>
       </div>
 
-      {/* Change Password */}
+      {}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <h3 className="font-bold text-gray-800 mb-5" style={{fontFamily:'Outfit,sans-serif'}}>Change Password</h3>
         <form onSubmit={handlePasswordChange} className="space-y-4">
@@ -126,7 +126,7 @@ export default function StudentProfile() {
         </form>
       </div>
 
-      {/* Read-only Enrollment Info */}
+      {}
       {userProfile?.isEnrolled && (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
           <h3 className="font-bold text-gray-800 mb-4" style={{fontFamily:'Outfit,sans-serif'}}>Enrollment Information</h3>

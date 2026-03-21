@@ -1,4 +1,4 @@
-// src/components/teacher/TeacherLayout.jsx
+
 import { useState } from 'react'
 import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'

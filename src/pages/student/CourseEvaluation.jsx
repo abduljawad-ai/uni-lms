@@ -1,4 +1,4 @@
-// src/pages/student/CourseEvaluation.jsx
+
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { db } from '../../firebase/config'
@@ -183,7 +183,7 @@ export default function CourseEvaluation() {
         </div>
       </div>
 
-      {/* Selectors */}
+      {}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
@@ -216,7 +216,7 @@ export default function CourseEvaluation() {
         </div>
       )}
 
-      {/* Evaluation Form */}
+      {}
       {selectedCourse && !loading && (
         <>
           {submitted && (
@@ -264,7 +264,7 @@ export default function CourseEvaluation() {
               </div>
             ))}
 
-            {/* Overall Comment */}
+            {}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
               <label className="label">Overall Comments / Suggestions</label>
               <textarea
@@ -277,7 +277,7 @@ export default function CourseEvaluation() {
               />
             </div>
 
-            {/* Progress */}
+            {}
             <div className="bg-white rounded-xl border border-gray-100 p-4 flex items-center justify-between flex-wrap gap-3">
               <div>
                 <p className="text-sm font-medium text-gray-700">

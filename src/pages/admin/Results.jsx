@@ -1,4 +1,4 @@
-// src/pages/admin/Results.jsx
+
 import { useEffect, useState } from 'react'
 import { db } from '../../firebase/config'
 import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore'
@@ -57,7 +57,7 @@ export default function AdminResults() {
         <p className="text-gray-500 text-sm">View, verify and publish exam results to students</p>
       </div>
 
-      {/* Filter */}
+      {}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
           <div>

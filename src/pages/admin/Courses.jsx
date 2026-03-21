@@ -1,4 +1,4 @@
-// src/pages/admin/Courses.jsx
+
 import { useEffect, useState } from 'react'
 import { db } from '../../firebase/config'
 import { collection, getDocs, addDoc, deleteDoc, doc, query, where, serverTimestamp } from 'firebase/firestore'

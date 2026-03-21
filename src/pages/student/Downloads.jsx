@@ -1,4 +1,4 @@
-// src/pages/student/Downloads.jsx
+
 import { useAuth } from '../../contexts/AuthContext'
 import { db } from '../../firebase/config'
 import { collection, query, where, getDocs, orderBy } from 'firebase/firestore'
@@ -12,7 +12,7 @@ function AdmissionStatement({ userProfile, challans }) {
 
   return (
     <div id="admission-statement-print" style={{ display:'none', padding:'20px', fontFamily:'Arial', fontSize:'11px' }}>
-      {/* University Header */}
+      {}
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', borderBottom:'2px solid #000', paddingBottom:'10px', marginBottom:'10px' }}>
         <div style={{ display:'flex', alignItems:'center', gap:'12px' }}>
           <div style={{ width:'60px', height:'60px', border:'2px solid #1e3a5f', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:'bold', color:'#1e3a5f' }}>LOGO</div>
@@ -30,7 +30,7 @@ function AdmissionStatement({ userProfile, challans }) {
         ADMISSION FEES PAID CHALLAN DETAILS
       </div>
 
-      {/* Student Details */}
+      {}
       <div style={{ border:'1px solid #000', marginBottom:'12px' }}>
         {[
           ['Application ID', userProfile?.appId || userProfile?.uid?.slice(-6)?.toUpperCase() || '—'],
@@ -49,7 +49,7 @@ function AdmissionStatement({ userProfile, challans }) {
         ))}
       </div>
 
-      {/* Fees Structure */}
+      {}
       <div style={{ marginBottom:'12px' }}>
         <div style={{ fontWeight:'bold', marginBottom:'6px', textDecoration:'underline' }}>Fees Structure</div>
         <table style={{ width:'100%', borderCollapse:'collapse', border:'1px solid #000', fontSize:'10px' }}>
@@ -85,7 +85,7 @@ function AdmissionStatement({ userProfile, challans }) {
         </table>
       </div>
 
-      {/* Paid Record */}
+      {}
       <div>
         <div style={{ fontWeight:'bold', marginBottom:'6px', textDecoration:'underline' }}>Paid Admission Fees Record</div>
         <table style={{ width:'100%', borderCollapse:'collapse', border:'1px solid #000', fontSize:'10px' }}>

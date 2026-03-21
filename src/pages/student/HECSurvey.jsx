@@ -1,4 +1,4 @@
-// src/pages/student/HECSurvey.jsx
+
 import { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { db } from '../../firebase/config'

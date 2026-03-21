@@ -1,10 +1,9 @@
-// src/firebase/seed.js
-// Run this once to populate initial data: departments, programs, batches
+
 import { db } from './config';
 import { doc, setDoc, collection, addDoc } from 'firebase/firestore';
 
 export const seedInitialData = async () => {
-  // Departments
+
   const departments = [
     { id: 'cs', name: 'Computer Science', shortName: 'CS' },
     { id: 'it', name: 'Information Technology', shortName: 'IT' },

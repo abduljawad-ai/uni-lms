@@ -1,4 +1,4 @@
-// src/pages/teacher/Profile.jsx
+
 import { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import toast from 'react-hot-toast'

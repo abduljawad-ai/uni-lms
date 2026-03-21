@@ -1,4 +1,4 @@
-// src/pages/admin/Departments.jsx
+
 import { useEffect, useState } from 'react'
 import { db } from '../../firebase/config'
 import { collection, getDocs, addDoc, doc, deleteDoc, setDoc } from 'firebase/firestore'

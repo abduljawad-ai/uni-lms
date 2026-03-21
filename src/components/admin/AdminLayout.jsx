@@ -1,4 +1,4 @@
-// src/components/admin/AdminLayout.jsx
+
 import { useState } from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'

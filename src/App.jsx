@@ -1,4 +1,4 @@
-// src/App.jsx
+
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from './contexts/AuthContext'
 
@@ -8,7 +8,6 @@ import ForgotPassword from './pages/auth/ForgotPassword'
 
 import Landing from './pages/Landing'
 
-// Student Pages
 import StudentLayout from './components/student/StudentLayout'
 import StudentDashboard from './pages/student/Dashboard'
 import StudentEnrollment from './pages/student/Enrollment'
@@ -30,7 +29,6 @@ import Downloads from './pages/student/Downloads'
 import Hostel from './pages/student/Hostel'
 import Transport from './pages/student/Transport'
 
-// Teacher Pages
 import TeacherLayout from './components/teacher/TeacherLayout'
 import TeacherDashboard from './pages/teacher/Dashboard'
 import TeacherCourses from './pages/teacher/Courses'
@@ -42,7 +40,6 @@ import TeacherProfile from './pages/teacher/Profile'
 import TeacherTimetable from './pages/teacher/Timetable'
 import TeacherMaterials from './pages/teacher/Materials'
 
-// Admin Pages
 import AdminLayout from './components/admin/AdminLayout'
 import AdminDashboard from './pages/admin/Dashboard'
 import AdminStudents from './pages/admin/Students'
@@ -63,13 +60,13 @@ import AdminSettings from './pages/admin/Settings'
 const PrivateRoute = ({ children, allowedRoles }) => {
   const { currentUser, userProfile, loading } = useAuth()
   const location = useLocation()
-  
+
   if (loading) return (
     <div className="flex items-center justify-center h-screen">
       <div className="w-8 h-8 border-4 border-[#1e3a5f]/20 border-t-[#1e3a5f] rounded-full animate-spin"></div>
     </div>
   )
-  
+
   if (!currentUser) return <Navigate to="/login" state={{ from: location }} replace />
   if (allowedRoles && !allowedRoles.includes(userProfile?.role)) return <Navigate to="/login" replace />
 
@@ -94,7 +91,7 @@ export default function App() {
       <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
       <Route path="/" element={<Landing />} />
 
-      {/* Student Routes */}
+      {}
       <Route path="/student" element={<PrivateRoute allowedRoles={['student']}><StudentLayout /></PrivateRoute>}>
         <Route index element={<StudentDashboard />} />
         <Route path="enrollment" element={<StudentEnrollment />} />
@@ -117,7 +114,7 @@ export default function App() {
         <Route path="transport" element={<Transport />} />
       </Route>
 
-      {/* Teacher Routes */}
+      {}
       <Route path="/teacher" element={<PrivateRoute allowedRoles={['teacher']}><TeacherLayout /></PrivateRoute>}>
         <Route index element={<TeacherDashboard />} />
         <Route path="courses" element={<TeacherCourses />} />
@@ -130,7 +127,7 @@ export default function App() {
         <Route path="profile" element={<TeacherProfile />} />
       </Route>
 
-      {/* Admin Routes */}
+      {}
       <Route path="/admin" element={<PrivateRoute allowedRoles={['admin']}><AdminLayout /></PrivateRoute>}>
         <Route index element={<AdminDashboard />} />
         <Route path="students" element={<AdminStudents />} />

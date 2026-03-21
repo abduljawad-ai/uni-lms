@@ -1,4 +1,4 @@
-// src/pages/admin/Timetable.jsx
+
 import { useEffect, useState } from 'react'
 import { db } from '../../firebase/config'
 import { collection, getDocs, addDoc, serverTimestamp, doc, deleteDoc, query, where } from 'firebase/firestore'

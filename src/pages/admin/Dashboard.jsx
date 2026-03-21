@@ -1,4 +1,4 @@
-// src/pages/admin/Dashboard.jsx
+
 import { useEffect, useState } from 'react'
 import { db } from '../../firebase/config'
 import { collection, getDocs, query, where } from 'firebase/firestore'
@@ -65,7 +65,7 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Bar Chart */}
+        {}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
           <h3 className="font-bold text-gray-800 mb-4" style={{fontFamily:'Outfit,sans-serif'}}>Students by Department</h3>
           {deptData.length > 0 ? (
@@ -81,7 +81,7 @@ export default function AdminDashboard() {
           ) : <div className="h-48 flex items-center justify-center text-gray-400 text-sm">No enrollment data yet</div>}
         </div>
 
-        {/* Quick Actions */}
+        {}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
           <h3 className="font-bold text-gray-800 mb-4" style={{fontFamily:'Outfit,sans-serif'}}>Quick Actions</h3>
           <div className="space-y-2">

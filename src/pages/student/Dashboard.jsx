@@ -1,4 +1,4 @@
-// src/pages/student/Dashboard.jsx
+
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
@@ -56,7 +56,7 @@ export default function StudentDashboard() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Welcome Banner */}
+      {}
       <div className="bg-[#1e3a5f] rounded-2xl p-6 text-white relative overflow-hidden">
         <div className="absolute right-0 top-0 w-64 h-full opacity-10">
           <div className="absolute top-4 right-4 w-32 h-32 rounded-full border-4 border-white" />
@@ -85,7 +85,7 @@ export default function StudentDashboard() {
         </div>
       </div>
 
-      {/* Enrollment Alert */}
+      {}
       {!isEnrolled && (
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
@@ -100,7 +100,7 @@ export default function StudentDashboard() {
         </div>
       )}
 
-      {/* Quick Links Grid */}
+      {}
       <div>
         <h2 className="text-lg font-bold text-gray-800 mb-3" style={{ fontFamily:'Outfit,sans-serif' }}>Quick Access</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
@@ -119,9 +119,9 @@ export default function StudentDashboard() {
         </div>
       </div>
 
-      {/* Bottom */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Challans */}
+        {}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
             <h3 className="font-bold text-gray-800" style={{ fontFamily:'Outfit,sans-serif' }}>Paid / Unpaid Challans</h3>
@@ -171,7 +171,7 @@ export default function StudentDashboard() {
           )}
         </div>
 
-        {/* Notices */}
+        {}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
             <h3 className="font-bold text-gray-800" style={{ fontFamily:'Outfit,sans-serif' }}>Recent Notices</h3>

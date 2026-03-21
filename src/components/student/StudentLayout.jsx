@@ -1,4 +1,4 @@
-// src/components/student/StudentLayout.jsx
+
 import { useState } from 'react'
 import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
@@ -90,7 +90,7 @@ export default function StudentLayout() {
           </button>
         </div>
 
-        {/* User Card */}
+        {}
         <div className="px-4 py-3 border-b border-white/10 flex-shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-[#f59e0b] rounded-full flex items-center justify-center flex-shrink-0">
@@ -106,7 +106,7 @@ export default function StudentLayout() {
           </div>
         </div>
 
-        {/* Navigation */}
+        {}
         <nav className="flex-1 overflow-y-auto sidebar-scroll py-3 px-2 space-y-4">
           {navGroups.map(group => (
             <div key={group.label}>
@@ -125,7 +125,7 @@ export default function StudentLayout() {
           ))}
         </nav>
 
-        {/* Logout */}
+        {}
         <div className="p-3 border-t border-white/10 flex-shrink-0">
           <button onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-300 hover:text-white hover:bg-red-600/30 transition-all">
@@ -134,12 +134,12 @@ export default function StudentLayout() {
         </div>
       </aside>
 
-      {/* Overlay */}
+      {}
       {sidebarOpen && <div className="fixed inset-0 bg-black/40 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />}
 
-      {/* Main */}
+      {}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Topbar */}
+        {}
         <header className="bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between flex-shrink-0 shadow-sm">
           <div className="flex items-center gap-3">
             <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-gray-500 hover:text-gray-700">

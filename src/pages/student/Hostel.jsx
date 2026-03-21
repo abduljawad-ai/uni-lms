@@ -1,4 +1,4 @@
-// src/pages/student/Hostel.jsx
+
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { db } from '../../firebase/config'
@@ -68,7 +68,7 @@ export default function Hostel() {
         </div>
       </div>
 
-      {/* My Application Status */}
+      {}
       {myApplication && (
         <div className={`rounded-2xl border p-4 flex items-center gap-3 ${myApplication.status === 'approved' ? 'bg-green-50 border-green-200' : myApplication.status === 'rejected' ? 'bg-red-50 border-red-200' : 'bg-yellow-50 border-yellow-200'}`}>
           {myApplication.status === 'approved' ? <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
@@ -83,7 +83,7 @@ export default function Hostel() {
         </div>
       )}
 
-      {/* Announcements */}
+      {}
       {announcements.length === 0 ? (
         <div className="bg-white rounded-2xl p-8 text-center border border-gray-100">
           <Home className="w-12 h-12 text-gray-200 mx-auto mb-3" />

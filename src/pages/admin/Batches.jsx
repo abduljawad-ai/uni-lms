@@ -1,4 +1,4 @@
-// src/pages/admin/Batches.jsx
+
 import { useEffect, useState } from 'react'
 import { db } from '../../firebase/config'
 import { doc, getDoc, setDoc } from 'firebase/firestore'

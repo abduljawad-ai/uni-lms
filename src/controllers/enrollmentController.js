@@ -1,17 +1,3 @@
-// src/controllers/enrollmentController.js
-// ============================================================
-//  UniPortal — Enrollment Controller  (v2 — Full Rewrite)
-//
-//  Workflow:
-//  1. Student submits enrollment request → status = PENDING
-//  2. Admin reviews → approves or rejects
-//  3. On approval:
-//     a. Roll number auto-assigned via atomic Firestore transaction
-//     b. User doc updated: enrollmentStatus=APPROVED + dept/program/semester
-//     c. Student auto-linked to all active courses for their
-//        department + programId + semesterNumber
-//  4. On rejection: enrollmentStatus=REJECTED + reason stored
-// ============================================================
 
 import {
   collection,
@@ -30,7 +16,6 @@ import {
 } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
-// ─── CONSTANTS ────────────────────────────────────────────────
 const ENROLLMENT_STATUS = {
   NONE:     'NONE',
   PENDING:  'PENDING',
@@ -38,19 +23,14 @@ const ENROLLMENT_STATUS = {
   REJECTED: 'REJECTED',
 };
 
-// ─────────────────────────────────────────────────────────────
-//  1. STUDENT — Submit Enrollment Request
-//     Called from the ChooseProgram page when student clicks
-//     "Request Enrollment" (NOT "Enroll Now")
-// ─────────────────────────────────────────────────────────────
 export async function submitEnrollmentRequest({
   studentId,
   departmentId,
   programId,
-  batchYear,    // e.g. "2K23"
-  currentYear,  // 1 | 2 | 3 | 4
+  batchYear,    
+  currentYear,  
 }) {
-  // 1. Guard: student must have enrollmentStatus === NONE
+
   const userSnap = await getDoc(doc(db, 'users', studentId));
   if (!userSnap.exists()) throw new Error('User not found.');
 
@@ -62,10 +42,9 @@ export async function submitEnrollmentRequest({
     if (user.enrollmentStatus === ENROLLMENT_STATUS.APPROVED) {
       throw new Error('You are already enrolled.');
     }
-    // REJECTED — allow re-application
+
   }
 
-  // 2. Guard: no duplicate pending request
   const existingQuery = query(
     collection(db, 'enrollmentRequests'),
     where('studentId', '==', studentId),
@@ -76,7 +55,6 @@ export async function submitEnrollmentRequest({
     throw new Error('A pending enrollment request already exists.');
   }
 
-  // 3. Validate department and program exist
   const [deptSnap, progSnap] = await Promise.all([
     getDoc(doc(db, 'departments', departmentId)),
     getDoc(doc(db, 'programs', programId)),
@@ -87,7 +65,6 @@ export async function submitEnrollmentRequest({
   const dept = deptSnap.data();
   const prog = progSnap.data();
 
-  // 4. Create enrollment request document
   const reqRef = await addDoc(collection(db, 'enrollmentRequests'), {
     studentId,
     studentName:    user.displayName,
@@ -105,7 +82,6 @@ export async function submitEnrollmentRequest({
     rejectionReason: null,
   });
 
-  // 5. Update user doc to PENDING (they see a "pending" screen on login)
   await updateDoc(doc(db, 'users', studentId), {
     enrollmentStatus: ENROLLMENT_STATUS.PENDING,
     updatedAt:        serverTimestamp(),
@@ -114,18 +90,13 @@ export async function submitEnrollmentRequest({
   return reqRef.id;
 }
 
-// ─────────────────────────────────────────────────────────────
-//  2. ADMIN — Approve Enrollment Request
-//     Atomically assigns roll number + updates user doc +
-//     links student to all matching active courses
-// ─────────────────────────────────────────────────────────────
 export async function approveEnrollment({
   requestId,
   adminId,
-  currentSemesterId,  // admin selects which active semester to place student in
-  semesterNumber,     // 1-8, determines which courses student links to
+  currentSemesterId,  
+  semesterNumber,     
 }) {
-  // Load the enrollment request
+
   const reqRef  = doc(db, 'enrollmentRequests', requestId);
   const reqSnap = await getDoc(reqRef);
   if (!reqSnap.exists())                      throw new Error('Request not found.');
@@ -133,11 +104,8 @@ export async function approveEnrollment({
 
   const req = reqSnap.data();
 
-  // ── Step 1: Atomically assign a unique roll number ─────────
-  // Counter doc: counters/{departmentCode}_{batchYear}
-  // Increments atomically, zero race conditions
   const deptSnap = await getDoc(doc(db, 'departments', req.departmentId));
-  const deptCode = deptSnap.data().code;  // e.g. "CS", "IT", "SE"
+  const deptCode = deptSnap.data().code;  
   const counterKey = `${deptCode}_${req.batchYear}`;
   const counterRef = doc(db, 'counters', counterKey);
 
@@ -149,10 +117,8 @@ export async function approveEnrollment({
     const serial      = String(nextSerial).padStart(3, '0');
     rollNumber        = `${req.batchYear}/${deptCode}/${serial}`;
 
-    // Write counter
     tx.set(counterRef, { serial: nextSerial, updatedAt: serverTimestamp() });
 
-    // Update user doc — single atomic write with all enrollment fields
     tx.update(doc(db, 'users', req.studentId), {
       enrollmentStatus:  ENROLLMENT_STATUS.APPROVED,
       rollNumber,
@@ -167,7 +133,6 @@ export async function approveEnrollment({
       updatedAt:         serverTimestamp(),
     });
 
-    // Update enrollment request
     tx.update(reqRef, {
       status:     ENROLLMENT_STATUS.APPROVED,
       rollNumber,
@@ -176,8 +141,6 @@ export async function approveEnrollment({
     });
   });
 
-  // ── Step 2: Link student to all active courses for their cohort ──
-  // Query courses matching department + program + semesterNumber
   const coursesQuery = query(
     collection(db, 'courses'),
     where('departmentId',  '==', req.departmentId),
@@ -206,7 +169,6 @@ export async function approveEnrollment({
     await batch.commit();
   }
 
-  // ── Step 3: Send welcome notification ─────────────────────
   await addDoc(collection(db, 'notifications'), {
     title:              'Enrollment Approved',
     body:               `Welcome to ${req.departmentName}! Your roll number is ${rollNumber}. You now have full access to your courses and portal.`,
@@ -223,9 +185,6 @@ export async function approveEnrollment({
   return { rollNumber };
 }
 
-// ─────────────────────────────────────────────────────────────
-//  3. ADMIN — Reject Enrollment Request
-// ─────────────────────────────────────────────────────────────
 export async function rejectEnrollment({
   requestId,
   adminId,
@@ -253,9 +212,6 @@ export async function rejectEnrollment({
   await batch.commit();
 }
 
-// ─────────────────────────────────────────────────────────────
-//  4. ADMIN — Fetch All Pending Enrollment Requests
-// ─────────────────────────────────────────────────────────────
 export async function getPendingEnrollments() {
   const q = query(
     collection(db, 'enrollmentRequests'),
@@ -266,10 +222,6 @@ export async function getPendingEnrollments() {
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 }
 
-// ─────────────────────────────────────────────────────────────
-//  5. ADMIN — Advance Student to Next Semester
-//     Called at end of academic semester by admin
-// ─────────────────────────────────────────────────────────────
 export async function advanceStudentSemester({
   studentId,
   newSemesterId,
@@ -285,7 +237,6 @@ export async function advanceStudentSemester({
 
   const user = userSnap.data();
 
-  // Deactivate old course enrollments
   const oldEnrollmentsQuery = query(
     collection(db, 'courseEnrollments'),
     where('studentId', '==', studentId),
@@ -299,7 +250,6 @@ export async function advanceStudentSemester({
     batch.update(d.ref, { isActive: false });
   });
 
-  // Update user's semester
   batch.update(userRef, {
     currentSemesterId: newSemesterId,
     semesterNumber:    newSemesterNumber,
@@ -309,7 +259,6 @@ export async function advanceStudentSemester({
 
   await batch.commit();
 
-  // Link to new semester's courses
   const coursesQuery = query(
     collection(db, 'courses'),
     where('departmentId', '==', user.departmentId),
@@ -339,9 +288,6 @@ export async function advanceStudentSemester({
   }
 }
 
-// ─────────────────────────────────────────────────────────────
-//  6. STUDENT — Get Own Enrollment Request Status
-// ─────────────────────────────────────────────────────────────
 export async function getMyEnrollmentRequest(studentId) {
   const q = query(
     collection(db, 'enrollmentRequests'),

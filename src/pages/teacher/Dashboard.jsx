@@ -1,4 +1,4 @@
-// src/pages/teacher/Dashboard.jsx
+
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { db } from '../../firebase/config'

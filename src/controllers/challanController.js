@@ -1,12 +1,3 @@
-// src/controllers/challanController.js
-// ============================================================
-//  UniPortal — Challan (Fee Voucher) Controller  (v2)
-//
-//  1. Admin generates bulk challans → targets dept+year+semester
-//  2. System queries all APPROVED students matching that cohort
-//  3. A challan doc is created per student (pushed to their portal)
-//  4. Download: generates a clean jsPDF voucher (no screenshot hack)
-// ============================================================
 
 import {
   collection,
@@ -24,32 +15,21 @@ import {
 } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
-// ─────────────────────────────────────────────────────────────
-//  HELPERS
-// ─────────────────────────────────────────────────────────────
-
-// Generates a human-readable challan number
-// Format: CHLN-YYYYMM-XXXXX  e.g. CHLN-202509-00142
 function generateChallanNumber() {
   const now    = new Date();
   const ym     = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`;
-  const serial = String(Math.floor(Math.random() * 90000) + 10000); // 5-digit
+  const serial = String(Math.floor(Math.random() * 90000) + 10000); 
   return `CHLN-${ym}-${serial}`;
 }
 
-// ─────────────────────────────────────────────────────────────
-//  1. ADMIN — Generate Bulk Challans
-//     Finds every APPROVED student in (dept + year + semester),
-//     creates a challan doc for each, records a bulk job.
-// ─────────────────────────────────────────────────────────────
 export async function generateBulkChallans({
   adminId,
   targetDepartmentId,
-  targetYear,          // 1 | 2 | 3 | 4
+  targetYear,          
   targetSemesterId,
-  amount,              // in PKR e.g. 35000
-  dueDate,             // JS Date object
-  feeDescription,      // e.g. "Tuition Fee — Fall 2025"
+  amount,              
+  dueDate,             
+  feeDescription,      
 }) {
   if (!adminId || !targetDepartmentId || !targetYear || !targetSemesterId)
     throw new Error('Admin ID, department, year, and semester are required.');
@@ -58,7 +38,6 @@ export async function generateBulkChallans({
   if (!dueDate || !(dueDate instanceof Date))
     throw new Error('A valid due date is required.');
 
-  // 1. Create the bulk job doc first (for auditability)
   const jobRef = await addDoc(collection(db, 'challanBulkJobs'), {
     targetDepartmentId,
     targetYear,
@@ -74,7 +53,6 @@ export async function generateBulkChallans({
     completedAt:     null,
   });
 
-  // 2. Query all APPROVED students in the target cohort
   const studentsQuery = query(
     collection(db, 'users'),
     where('role',               '==', 'student'),
@@ -98,8 +76,6 @@ export async function generateBulkChallans({
   const students        = studentsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
   const studentsTargeted = students.length;
 
-  // 3. Batch-write a challan per student
-  //    Firestore batch limit = 500 ops → chunk if needed
   const BATCH_SIZE = 400;
   let studentsReached = 0;
 
@@ -127,7 +103,7 @@ export async function generateBulkChallans({
         feeDescription,
         dueDate:             Timestamp.fromDate(dueDate),
         issueDate:           serverTimestamp(),
-        status:              'UNPAID',    // UNPAID | PAID | OVERDUE | CANCELLED
+        status:              'UNPAID',    
         paidAt:              null,
         paymentRef:          null,
         isActive:            true,
@@ -138,7 +114,6 @@ export async function generateBulkChallans({
     studentsReached += chunk.length;
   }
 
-  // 4. Update bulk job with final count
   await updateDoc(jobRef, {
     studentsTargeted,
     studentsReached,
@@ -146,7 +121,6 @@ export async function generateBulkChallans({
     completedAt: serverTimestamp(),
   });
 
-  // 5. Send a notification to the cohort about the new challan
   await addDoc(collection(db, 'notifications'), {
     title:              `Fee Challan Issued — ${feeDescription}`,
     body:               `A fee challan of PKR ${amount.toLocaleString()} has been issued. Due date: ${dueDate.toLocaleDateString('en-PK')}. Please visit the Fee Challan section to download your voucher.`,
@@ -164,9 +138,6 @@ export async function generateBulkChallans({
   return { jobId: jobRef.id, studentsReached };
 }
 
-// ─────────────────────────────────────────────────────────────
-//  2. STUDENT — Fetch own challans
-// ─────────────────────────────────────────────────────────────
 export async function fetchStudentChallans(studentId) {
   const q = query(
     collection(db, 'challans'),
@@ -178,9 +149,6 @@ export async function fetchStudentChallans(studentId) {
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 }
 
-// ─────────────────────────────────────────────────────────────
-//  3. ADMIN — Mark challan as paid
-// ─────────────────────────────────────────────────────────────
 export async function markChallanPaid(challanId, paymentRef) {
   await updateDoc(doc(db, 'challans', challanId), {
     status:     'PAID',
@@ -189,19 +157,8 @@ export async function markChallanPaid(challanId, paymentRef) {
   });
 }
 
-// ─────────────────────────────────────────────────────────────
-//  4. DOWNLOAD CHALLAN AS PDF
-//     Replaces the broken "take screenshot of screen" approach
-//     Uses jsPDF (import from cdnjs or npm)
-//
-//  Usage (in your React component):
-//    import { downloadChallanPDF } from '../controllers/challanController';
-//    <button onClick={() => downloadChallanPDF(challan, universityInfo)}>
-//      Download PDF
-//    </button>
-// ─────────────────────────────────────────────────────────────
 export async function downloadChallanPDF(challan, universityInfo = {}) {
-  // Dynamic import so jsPDF is only loaded when needed
+
   const { jsPDF } = await import('jspdf');
 
   const doc = new jsPDF({
@@ -213,7 +170,7 @@ export async function downloadChallanPDF(challan, universityInfo = {}) {
   const PAGE_W   = 210;
   const PAGE_H   = 297;
   const MARGIN   = 20;
-  const COL_W    = (PAGE_W - MARGIN * 2 - 10) / 2; // two columns with 10mm gap
+  const COL_W    = (PAGE_W - MARGIN * 2 - 10) / 2; 
   const uniName  = universityInfo.name  || 'University Name';
   const uniAddr  = universityInfo.address || 'University Address, Pakistan';
   const uniPhone = universityInfo.phone || '';
@@ -228,7 +185,6 @@ export async function downloadChallanPDF(challan, universityInfo = {}) {
   const formatAmount = (amt) =>
     `PKR ${Number(amt).toLocaleString('en-PK')}`;
 
-  // ── HELPER FUNCTIONS ────────────────────────────────────────
   const setFont = (style = 'normal', size = 10) => {
     doc.setFont('helvetica', style);
     doc.setFontSize(size);
@@ -258,8 +214,7 @@ export async function downloadChallanPDF(challan, universityInfo = {}) {
     doc.text(String(value || '—'), x + labelW, y);
   };
 
-  // ── HEADER BAND ─────────────────────────────────────────────
-  doc.setFillColor(15, 76, 129);   // deep navy
+  doc.setFillColor(15, 76, 129);   
   doc.rect(0, 0, PAGE_W, 28, 'F');
 
   setFont('bold', 16);
@@ -270,14 +225,12 @@ export async function downloadChallanPDF(challan, universityInfo = {}) {
   doc.text(uniAddr, PAGE_W / 2, 18, { align: 'center' });
   if (uniPhone) doc.text(`Tel: ${uniPhone}`, PAGE_W / 2, 23, { align: 'center' });
 
-  // ── CHALLAN TITLE ────────────────────────────────────────────
   setFont('bold', 13);
   doc.setTextColor(15, 76, 129);
   doc.text('FEE DEPOSIT CHALLAN', PAGE_W / 2, 38, { align: 'center' });
 
   hLine(41, MARGIN, PAGE_W - MARGIN, 0.5);
 
-  // ── STATUS BADGE ─────────────────────────────────────────────
   const statusColors = {
     UNPAID:    [220, 53, 69],
     PAID:      [40, 167, 69],
@@ -291,7 +244,6 @@ export async function downloadChallanPDF(challan, universityInfo = {}) {
   doc.setTextColor(255, 255, 255);
   doc.text(challan.status, PAGE_W - MARGIN - 15, 36.5, { align: 'center' });
 
-  // ── CHALLAN META (two columns) ───────────────────────────────
   let y = 50;
   setFont('bold', 9);
   doc.setTextColor(80, 80, 80);
@@ -306,7 +258,6 @@ export async function downloadChallanPDF(challan, universityInfo = {}) {
   y += 10;
   hLine(y, MARGIN, PAGE_W - MARGIN, 0.3);
 
-  // ── STUDENT INFO BOX ─────────────────────────────────────────
   y += 5;
   doc.setFillColor(245, 248, 252);
   doc.rect(MARGIN, y, PAGE_W - MARGIN * 2, 38, 'F');
@@ -334,8 +285,6 @@ export async function downloadChallanPDF(challan, universityInfo = {}) {
 
   y += 16;
 
-  // ── FEE BREAKDOWN TABLE ──────────────────────────────────────
-  // Header row
   doc.setFillColor(15, 76, 129);
   doc.rect(MARGIN, y, PAGE_W - MARGIN * 2, 8, 'F');
   setFont('bold', 9);
@@ -345,7 +294,6 @@ export async function downloadChallanPDF(challan, universityInfo = {}) {
 
   y += 8;
 
-  // Data row(s) — currently one fee line; extend array for multi-line breakdown
   const feeRows = [
     { label: challan.feeDescription || 'Tuition Fee', amount: challan.amount },
   ];
@@ -364,7 +312,6 @@ export async function downloadChallanPDF(challan, universityInfo = {}) {
     y += 8;
   });
 
-  // Total row
   doc.setFillColor(230, 240, 250);
   doc.rect(MARGIN, y, PAGE_W - MARGIN * 2, 9, 'F');
   setFont('bold', 10);
@@ -375,7 +322,6 @@ export async function downloadChallanPDF(challan, universityInfo = {}) {
 
   y += 8;
 
-  // ── BANK DEPOSIT INSTRUCTIONS ────────────────────────────────
   doc.setFillColor(255, 252, 235);
   doc.rect(MARGIN, y, PAGE_W - MARGIN * 2, 30, 'F');
   doc.setDrawColor(230, 200, 50);
@@ -400,14 +346,13 @@ export async function downloadChallanPDF(challan, universityInfo = {}) {
 
   y += 35;
 
-  // ── PAID STAMP (conditional) ─────────────────────────────────
   if (challan.status === 'PAID') {
     doc.setDrawColor(40, 167, 69);
     doc.setLineWidth(1.5);
     doc.setFontSize(28);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(40, 167, 69);
-    // Rotate "PAID" stamp diagonally
+
     doc.saveGraphicsState();
     doc.text('✓ PAID', PAGE_W / 2, y - 10, { align: 'center', angle: 0 });
     doc.restoreGraphicsState();
@@ -427,7 +372,6 @@ export async function downloadChallanPDF(challan, universityInfo = {}) {
   hLine(y, MARGIN, PAGE_W - MARGIN, 0.3);
   y += 5;
 
-  // ── FOOTER ───────────────────────────────────────────────────
   setFont('normal', 8);
   doc.setTextColor(150, 150, 150);
   doc.text(
@@ -441,14 +385,10 @@ export async function downloadChallanPDF(challan, universityInfo = {}) {
     { align: 'center' }
   );
 
-  // ── SAVE ─────────────────────────────────────────────────────
   const filename = `Challan_${challan.challanNumber}_${challan.rollNumber || challan.studentId}.pdf`;
   doc.save(filename);
 }
 
-// ─────────────────────────────────────────────────────────────
-//  5. ADMIN — Fetch challans for a specific cohort
-// ─────────────────────────────────────────────────────────────
 export async function fetchCohortChallans({
   departmentId,
   targetYear,
@@ -466,9 +406,6 @@ export async function fetchCohortChallans({
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 }
 
-// ─────────────────────────────────────────────────────────────
-//  6. ADMIN — Fetch all bulk generation jobs
-// ─────────────────────────────────────────────────────────────
 export async function fetchBulkJobs() {
   const q = query(
     collection(db, 'challanBulkJobs'),

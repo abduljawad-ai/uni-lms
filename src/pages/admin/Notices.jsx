@@ -1,4 +1,4 @@
-// src/pages/admin/Notices.jsx
+
 import { useEffect, useState } from 'react'
 import { db } from '../../firebase/config'
 import { collection, getDocs, addDoc, serverTimestamp, doc, updateDoc, deleteDoc, orderBy, query } from 'firebase/firestore'

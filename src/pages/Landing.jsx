@@ -1,11 +1,11 @@
-// src/pages/Landing.jsx
+
 import { Link } from 'react-router-dom'
 import { GraduationCap, BookOpen, Users, Shield, ArrowRight, CheckCircle, Smartphone, Layout, Globe } from 'lucide-react'
 
 export default function Landing() {
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-      {/* Navigation */}
+      {}
       <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md z-50 border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
@@ -30,7 +30,7 @@ export default function Landing() {
         </div>
       </nav>
 
-      {/* Hero Section */}
+      {}
       <section className="pt-32 pb-20 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:flex items-center gap-16">
@@ -67,7 +67,7 @@ export default function Landing() {
                 <img src={`${import.meta.env.BASE_URL}images/hero.png`} alt="University Campus" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#1e3a5f]/40 to-transparent"></div>
               </div>
-              {/* Floating Cards */}
+              {}
               <div className="absolute -bottom-6 -left-6 bg-white p-4 rounded-2xl shadow-xl flex items-center gap-4 animate-bounce-slow">
                 <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
                   <CheckCircle className="w-6 h-6 text-green-600" />
@@ -91,7 +91,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Stats Section */}
+      {}
       <section className="py-12 bg-gray-50/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
@@ -113,7 +113,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Portals Section */}
+      {}
       <section id="features" className="py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -122,7 +122,7 @@ export default function Landing() {
           </div>
 
           <div className="grid lg:grid-cols-3 gap-8">
-            {/* Student Portal */}
+            {}
             <div className="group bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300">
               <div className="aspect-video rounded-2xl overflow-hidden mb-8">
                 <img src={`${import.meta.env.BASE_URL}images/student.png`} alt="Student Portal" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
@@ -143,7 +143,7 @@ export default function Landing() {
               </Link>
             </div>
 
-            {/* Teacher Portal */}
+            {}
             <div className="group bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300">
               <div className="aspect-video rounded-2xl overflow-hidden mb-8">
                 <img src={`${import.meta.env.BASE_URL}images/teacher.png`} alt="Teacher Portal" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
@@ -164,7 +164,7 @@ export default function Landing() {
               </Link>
             </div>
 
-            {/* Admin Panel */}
+            {}
             <div className="group bg-white rounded-[2rem] p-8 border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300">
               <div className="aspect-video rounded-2xl overflow-hidden mb-8">
                 <img src={`${import.meta.env.BASE_URL}images/library.png`} alt="Admin Panel" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
@@ -188,16 +188,16 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-[#1e3a5f] rounded-[3rem] p-12 lg:p-20 relative overflow-hidden text-center">
-            {/* Background Pattern */}
+            {}
             <div className="absolute inset-0 opacity-10 pointer-events-none">
               <div className="absolute top-0 left-0 w-96 h-96 rounded-full border-8 border-white -translate-x-1/2 -translate-y-1/2"></div>
               <div className="absolute bottom-0 right-0 w-64 h-64 rounded-full border-8 border-white translate-x-1/2 translate-y-1/2"></div>
             </div>
-            
+
             <div className="relative z-10">
               <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6" style={{ fontFamily: 'Outfit, sans-serif' }}>
                 Ready to Modernize Your University?
@@ -218,7 +218,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Footer */}
+      {}
       <footer className="bg-white pt-20 pb-10 border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-4 gap-12 mb-16">
@@ -236,7 +236,7 @@ export default function Landing() {
                 An open-source initiative to digitize Pakistani universities. Empowering students and teachers with modern learning tools.
               </p>
               <div className="flex gap-4">
-                {/* Social Icons */}
+                {}
                 {[1,2,3,4].map(i => (
                   <div key={i} className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center cursor-pointer hover:bg-blue-50 transition-colors">
                     <div className="w-5 h-5 bg-gray-300 rounded-md"></div>

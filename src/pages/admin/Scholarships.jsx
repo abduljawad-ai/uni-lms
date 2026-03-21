@@ -1,4 +1,4 @@
-// src/pages/admin/Scholarships.jsx
+
 import { useEffect, useState } from 'react'
 import { db } from '../../firebase/config'
 import { collection, getDocs, addDoc, serverTimestamp, doc, deleteDoc, orderBy, query } from 'firebase/firestore'

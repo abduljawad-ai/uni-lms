@@ -1,4 +1,4 @@
-// src/pages/student/Attendance.jsx - Updated with semester selector
+
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { db } from '../../firebase/config'
@@ -57,7 +57,7 @@ export default function StudentAttendance() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Header */}
+      {}
       <div className="bg-[#1e3a5f] rounded-2xl p-5 text-white">
         <div className="flex items-center gap-3">
           <ClipboardList className="w-6 h-6 text-blue-300" />
@@ -68,7 +68,7 @@ export default function StudentAttendance() {
         </div>
       </div>
 
-      {/* Semester Selector */}
+      {}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
         <label className="label">Select Semester</label>
         <select value={selectedSem} onChange={e => setSelectedSem(e.target.value)} className="input-field max-w-md">
@@ -82,10 +82,10 @@ export default function StudentAttendance() {
         </button>
       </div>
 
-      {/* Results */}
+      {}
       {searched && !loading && (
         <>
-          {/* Summary */}
+          {}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
               { label: 'Overall %', value: `${percentage}%`, icon: TrendingUp, color: percentage >= 75 ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600', bg: percentage >= 75 ? 'bg-green-50' : 'bg-red-50' },

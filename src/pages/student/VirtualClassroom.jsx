@@ -1,4 +1,4 @@
-// src/pages/student/VirtualClassroom.jsx - Week-based course material viewer
+
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { db } from '../../firebase/config'
@@ -79,7 +79,7 @@ export default function VirtualClassroom() {
         </div>
       </div>
 
-      {/* Notes like the reference */}
+      {}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
         <div className="bg-red-50 border border-red-100 rounded-xl p-4 text-xs text-red-700 space-y-1 mb-4">
           <p><strong>NOTE:</strong></p>

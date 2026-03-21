@@ -1,9 +1,3 @@
-// src/pages/student/Challan.jsx
-// ============================================================
-//  Student Fee Challan Page — Mock 1BILL Payment Flow
-//  Flow: View Challans → Click Pay → Enter Consumer No →
-//        Inquiry → Select Bank → Confirm → Receipt
-// ============================================================
 
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
@@ -12,7 +6,6 @@ import { mockInquiry, mockConfirmation, MOCK_BANKS } from '../../services/paymen
 import { CreditCard, Download, CheckCircle, XCircle, Clock, Search, X, AlertCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-// ─── STATUS BADGE ──────────────────────────────────────────────
 function StatusBadge({ status }) {
   const map = {
     UNPAID:    'bg-red-50 text-red-700 border border-red-200',
@@ -27,9 +20,8 @@ function StatusBadge({ status }) {
   )
 }
 
-// ─── PAYMENT MODAL ─────────────────────────────────────────────
 function PaymentModal({ challan, onClose, onPaid }) {
-  const [step, setStep]           = useState('inquiry')  // inquiry | bank | processing | receipt | failed
+  const [step, setStep]           = useState('inquiry')  
   const [consumerNo, setConsumerNo] = useState(challan?.rollNumber || '')
   const [inquiryResult, setInquiryResult] = useState(null)
   const [selectedBank, setSelectedBank]   = useState('')
@@ -75,7 +67,7 @@ function PaymentModal({ challan, onClose, onPaid }) {
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
 
-        {/* Header */}
+        {}
         <div className="bg-[#1e3a5f] px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <CreditCard className="w-5 h-5 text-blue-300" />
@@ -90,7 +82,7 @@ function PaymentModal({ challan, onClose, onPaid }) {
           )}
         </div>
 
-        {/* Steps indicator */}
+        {}
         {!['processing', 'receipt', 'failed'].includes(step) && (
           <div className="flex items-center px-6 py-3 bg-gray-50 border-b border-gray-100">
             {['inquiry', 'bank'].map((s, i) => (
@@ -110,7 +102,7 @@ function PaymentModal({ challan, onClose, onPaid }) {
 
         <div className="p-6">
 
-          {/* ── STEP 1: INQUIRY ── */}
+          {}
           {step === 'inquiry' && (
             <div className="space-y-4">
               <div className="bg-blue-50 rounded-xl p-4 text-sm text-blue-800">
@@ -140,10 +132,10 @@ function PaymentModal({ challan, onClose, onPaid }) {
             </div>
           )}
 
-          {/* ── STEP 2: SELECT BANK ── */}
+          {}
           {step === 'bank' && inquiryResult && (
             <div className="space-y-4">
-              {/* Inquiry result card */}
+              {}
               <div className="bg-green-50 border border-green-200 rounded-xl p-4 space-y-2">
                 <div className="flex items-center gap-2 mb-2">
                   <CheckCircle className="w-4 h-4 text-green-600" />
@@ -168,7 +160,7 @@ function PaymentModal({ challan, onClose, onPaid }) {
                 )}
               </div>
 
-              {/* Bank selection */}
+              {}
               <div>
                 <label className="text-sm font-semibold text-gray-700 block mb-2">Select Payment Method</label>
                 <div className="grid grid-cols-3 gap-2">
@@ -209,7 +201,7 @@ function PaymentModal({ challan, onClose, onPaid }) {
             </div>
           )}
 
-          {/* ── PROCESSING ── */}
+          {}
           {step === 'processing' && (
             <div className="py-8 text-center space-y-4">
               <div className="w-14 h-14 border-4 border-[#1e3a5f]/20 border-t-[#1e3a5f] rounded-full animate-spin mx-auto" />
@@ -225,7 +217,7 @@ function PaymentModal({ challan, onClose, onPaid }) {
             </div>
           )}
 
-          {/* ── RECEIPT ── */}
+          {}
           {step === 'receipt' && txnResult?.success && (
             <div className="space-y-4">
               <div className="text-center py-4">
@@ -260,7 +252,7 @@ function PaymentModal({ challan, onClose, onPaid }) {
             </div>
           )}
 
-          {/* ── FAILED ── */}
+          {}
           {step === 'failed' && (
             <div className="space-y-4">
               <div className="text-center py-4">
@@ -285,7 +277,6 @@ function PaymentModal({ challan, onClose, onPaid }) {
   )
 }
 
-// ─── MAIN PAGE ─────────────────────────────────────────────────
 export default function StudentChallan() {
   const { userProfile } = useAuth()
   const [challans, setChallans]         = useState([])
@@ -332,7 +323,7 @@ export default function StudentChallan() {
   return (
     <div className="space-y-6 animate-fade-in">
 
-      {/* Header */}
+      {}
       <div className="bg-[#1e3a5f] rounded-2xl p-5 text-white">
         <div className="flex items-center gap-3">
           <CreditCard className="w-6 h-6 text-blue-300" />
@@ -343,7 +334,7 @@ export default function StudentChallan() {
         </div>
       </div>
 
-      {/* Summary cards */}
+      {}
       <div className="grid grid-cols-3 gap-4">
         {[
           { label: 'Total',   value: challans.length, color: 'bg-blue-50 text-blue-700' },
@@ -357,7 +348,7 @@ export default function StudentChallan() {
         ))}
       </div>
 
-      {/* Challans list */}
+      {}
       {loading ? (
         <div className="flex items-center justify-center h-40">
           <div className="w-8 h-8 border-4 border-[#1e3a5f]/20 border-t-[#1e3a5f] rounded-full animate-spin" />
@@ -399,7 +390,7 @@ export default function StudentChallan() {
                   </div>
                 </div>
 
-                {/* Action buttons */}
+                {}
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleDownload(challan)}
@@ -432,7 +423,7 @@ export default function StudentChallan() {
         </div>
       )}
 
-      {/* Payment Modal */}
+      {}
       {payingChallan && (
         <PaymentModal
           challan={payingChallan}

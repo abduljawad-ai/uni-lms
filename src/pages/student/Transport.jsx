@@ -1,4 +1,4 @@
-// src/pages/student/Transport.jsx
+
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { db } from '../../firebase/config'
@@ -6,7 +6,6 @@ import { doc, getDoc, setDoc, serverTimestamp, collection, getDocs } from 'fireb
 import { MapPin, Save, CheckCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-// Pakistan cities and their common areas
 const PAKISTAN_CITIES = {
   'KARACHI': ['SADDAR','CLIFTON','DEFENCE','GULSHAN-E-IQBAL','KORANGI','MALIR','NAZIMABAD','NORTH NAZIMABAD','GULISTAN-E-JOHAR','SHAH FAISAL COLONY','ORANGI','SITE','LANDHI'],
   'HYDERABAD': ['LATIFABAD','QASIMABAD','AUTO BHAN ROAD','HIRABAD','HUSSAINABAD','MARKET','OLD CITY'],
@@ -89,7 +88,7 @@ export default function Transport() {
         </div>
       </div>
 
-      {/* Current Location */}
+      {}
       {existingData && (
         <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
           <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
@@ -151,7 +150,7 @@ export default function Transport() {
         </div>
       </div>
 
-      {/* Info Cards */}
+      {}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
           <h3 className="font-bold text-gray-800 mb-3" style={{ fontFamily:'Outfit,sans-serif' }}>Transport Schedule</h3>

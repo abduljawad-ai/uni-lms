@@ -8,11 +8,11 @@ import toast from 'react-hot-toast'
 
 export default function AdminEnrollments() {
   const { userProfile } = useAuth()
-  const [tab, setTab] = useState('pending') // 'pending' | 'approved'
-  
+  const [tab, setTab] = useState('pending') 
+
   const [students, setStudents] = useState([])
   const [pendingRequests, setPendingRequests] = useState([])
-  
+
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
 
@@ -46,7 +46,7 @@ export default function AdminEnrollments() {
       await approveEnrollment({
         requestId: req.id,
         adminId: userProfile?.uid,
-        currentSemesterId: 'SEM1', // Default for new student
+        currentSemesterId: 'SEM1', 
         semesterNumber: 1
       })
       toast.success('Enrollment Approved!')
@@ -90,7 +90,7 @@ export default function AdminEnrollments() {
         <h1 className="text-2xl font-bold text-[#0d1f35]" style={{fontFamily:'Outfit,sans-serif'}}>Enrollments</h1>
         <p className="text-gray-500 text-sm">Manage student enrollment requests</p>
       </div>
-      
+
       <div className="flex gap-4 border-b border-gray-200">
         <button 
           onClick={() => setTab('pending')}
@@ -111,7 +111,7 @@ export default function AdminEnrollments() {
         <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search..."
           className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0d1f35] text-sm bg-white"/>
       </div>
-      
+
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         {loading ? (
           <div className="p-8 text-center"><div className="w-8 h-8 border-4 border-[#0d1f35]/20 border-t-[#0d1f35] rounded-full animate-spin mx-auto"/></div>

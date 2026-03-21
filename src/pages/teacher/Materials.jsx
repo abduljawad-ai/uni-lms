@@ -1,4 +1,4 @@
-// src/pages/teacher/Materials.jsx
+
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { db } from '../../firebase/config'
@@ -31,7 +31,7 @@ export default function TeacherMaterials() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!form.courseId || !form.title || !form.url) return toast.error('Fill required fields')
-    
+
     setUploading(true)
     try {
       const course = courses.find(c=>c.id===form.courseId)
@@ -75,7 +75,7 @@ export default function TeacherMaterials() {
             <h3 className="font-bold text-gray-800" style={{fontFamily:'Outfit,sans-serif'}}>Add Course Material</h3>
             <button onClick={()=>setShowForm(false)}><X className="w-5 h-5 text-gray-400 hover:text-gray-600"/></button>
           </div>
-          
+
           <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-xs text-blue-700 space-y-2 mb-6">
             <div className="flex items-center gap-2 font-bold mb-1">
               <AlertCircle className="w-4 h-4" />

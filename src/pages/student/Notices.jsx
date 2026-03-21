@@ -1,4 +1,4 @@
-// src/pages/student/Notices.jsx
+
 import { useEffect, useState } from 'react'
 import { db } from '../../firebase/config'
 import { collection, query, where, getDocs, orderBy } from 'firebase/firestore'

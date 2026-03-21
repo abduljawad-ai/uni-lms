@@ -1,4 +1,4 @@
-// src/pages/admin/Profile.jsx
+
 import { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { db } from '../../firebase/config'
@@ -60,7 +60,7 @@ export default function AdminProfile() {
     <div className="space-y-6 animate-fade-in max-w-2xl">
       <h1 className="text-2xl font-bold text-[#0d1f35]" style={{fontFamily:'Outfit,sans-serif'}}>Admin Profile</h1>
 
-      {/* Avatar */}
+      {}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex items-center gap-5">
         <div className="w-20 h-20 bg-[#0d1f35] rounded-2xl flex items-center justify-center flex-shrink-0">
           <span className="text-white font-bold text-2xl">{initials}</span>
@@ -72,7 +72,7 @@ export default function AdminProfile() {
         </div>
       </div>
 
-      {/* Edit Profile */}
+      {}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <h3 className="font-bold text-gray-800 mb-5" style={{fontFamily:'Outfit,sans-serif'}}>Edit Profile & University Info</h3>
         <form onSubmit={handleSave} className="space-y-4">
@@ -105,7 +105,7 @@ export default function AdminProfile() {
         </form>
       </div>
 
-      {/* Change Password */}
+      {}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <h3 className="font-bold text-gray-800 mb-5" style={{fontFamily:'Outfit,sans-serif'}}>Change Password</h3>
         <form onSubmit={handlePwChange} className="space-y-4">
@@ -122,7 +122,7 @@ export default function AdminProfile() {
         </form>
       </div>
 
-      {/* Seed Data */}
+      {}
       <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6">
         <h3 className="font-bold text-amber-900 mb-2" style={{fontFamily:'Outfit,sans-serif'}}>🌱 Initial Data Seed</h3>
         <p className="text-amber-800 text-sm mb-4">

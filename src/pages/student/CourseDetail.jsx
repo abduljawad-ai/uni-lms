@@ -1,4 +1,4 @@
-// src/pages/student/CourseDetail.jsx
+
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { db } from '../../firebase/config'
@@ -53,7 +53,7 @@ export default function StudentCourseDetail() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Materials */}
+        {}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
             <h3 className="font-bold text-gray-800" style={{fontFamily:'Outfit,sans-serif'}}>Course Materials</h3>

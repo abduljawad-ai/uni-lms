@@ -1,4 +1,4 @@
-// src/pages/auth/Login.jsx
+
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
@@ -21,7 +21,7 @@ export default function Login() {
     try {
       await login(email, password)
       toast.success('Welcome back!')
-      // Navigation handled by App.jsx redirect
+
     } catch (err) {
       const msg = err.code === 'auth/invalid-credential' ? 'Invalid email or password'
         : err.code === 'auth/too-many-requests' ? 'Too many attempts. Try later.'
@@ -34,9 +34,9 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-      {/* Left Panel */}
+      {}
       <div className="hidden lg:flex lg:w-1/2 bg-[#1e3a5f] relative overflow-hidden items-center justify-center p-12">
-        {/* Background Image with Overlay */}
+        {}
         <div className="absolute inset-0 z-0">
           <img src={`${import.meta.env.BASE_URL}images/auth-side.png`} alt="University Hallway" className="w-full h-full object-cover opacity-40" />
           <div className="absolute inset-0 bg-gradient-to-br from-[#1e3a5f] via-[#1e3a5f]/80 to-transparent"></div>
@@ -76,10 +76,10 @@ export default function Login() {
         </div>
       </div>
 
-      {/* Right Panel */}
+      {}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('${import.meta.env.BASE_URL}images/auth-bg.png')` }}>
         <div className="w-full max-w-md">
-          {/* Mobile Logo */}
+          {}
           <div className="flex lg:hidden items-center gap-3 justify-center mb-8">
             <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg mb-4 overflow-hidden">
               <img src="/images/logo.png" alt="UniPortal Logo" className="w-full h-full object-cover" />

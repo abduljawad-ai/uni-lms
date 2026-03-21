@@ -1,4 +1,4 @@
-// src/pages/student/CourseSelectionForm.jsx
+
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { db } from '../../firebase/config'
@@ -15,9 +15,9 @@ const EXAM_TYPES = ['Regular', 'Improvement', 'Failure']
 
 export default function CourseSelectionForm() {
   const { userProfile } = useAuth()
-  const [tab, setTab] = useState('selected') // 'selected' | 'choose'
-  const [courses, setCourses] = useState([])          // available courses for semester
-  const [selectedSubjects, setSelectedSubjects] = useState([])  // student's chosen subjects
+  const [tab, setTab] = useState('selected') 
+  const [courses, setCourses] = useState([])          
+  const [selectedSubjects, setSelectedSubjects] = useState([])  
   const [examType, setExamType] = useState('Regular')
   const [semester, setSemester] = useState(userProfile?.currentSemester || 1)
   const [examYear] = useState(new Date().getFullYear().toString())
@@ -39,7 +39,6 @@ export default function CourseSelectionForm() {
         ))
         setCourses(cSnap.docs.map(d => ({ id: d.id, ...d.data() })))
 
-        // Fetch already-selected subjects for this form
         const fId = `${userProfile.uid}_sem${semester}_${examYear}_${examType}`
         setFormId(fId)
         const fSnap = await getDoc(doc(db, 'examForms', fId))
@@ -114,7 +113,7 @@ export default function CourseSelectionForm() {
 
   return (
     <div className="space-y-5 animate-fade-in">
-      {/* Header */}
+      {}
       <div className="bg-[#1e3a5f] rounded-2xl p-5 text-white">
         <div className="flex items-center gap-3">
           <FileText className="w-6 h-6 text-blue-300" />
@@ -127,7 +126,7 @@ export default function CourseSelectionForm() {
         </div>
       </div>
 
-      {/* Exam Config */}
+      {}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
@@ -149,7 +148,7 @@ export default function CourseSelectionForm() {
         </div>
       </div>
 
-      {/* Tabs */}
+      {}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="flex border-b border-gray-100">
           <button onClick={() => setTab('selected')}
@@ -162,10 +161,10 @@ export default function CourseSelectionForm() {
           </button>
         </div>
 
-        {/* Selected Courses Tab */}
+        {}
         {tab === 'selected' && (
           <div>
-            {/* Student Info Box */}
+            {}
             <div className="bg-blue-50 border-b border-blue-100 p-4">
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-sm">
                 {[
@@ -183,7 +182,7 @@ export default function CourseSelectionForm() {
               </div>
             </div>
 
-            {/* Form Info Table */}
+            {}
             <div className="bg-[#1e3a5f] mx-5 mt-4 mb-0 rounded-t-xl px-5 py-2.5">
               <p className="text-white font-semibold text-sm text-center">
                 FORM INFORMATION FOR THE {semester} {['ST','ND','RD','TH','TH','TH','TH','TH'][semester-1]||'TH'} {examType.toUpperCase()} {examYear}
@@ -217,7 +216,7 @@ export default function CourseSelectionForm() {
               </table>
             </div>
 
-            {/* Course/Subjects */}
+            {}
             <div className="px-5 pb-5">
               <p className="text-sm font-bold text-gray-700 mb-2 bg-yellow-50 border border-yellow-100 rounded-lg px-4 py-2">COURSE / SUBJECTS</p>
               {loading ? (
@@ -242,17 +241,17 @@ export default function CourseSelectionForm() {
           </div>
         )}
 
-        {/* Choose Subjects Tab */}
+        {}
         {tab === 'choose' && (
           <div className="p-5 space-y-5">
-            {/* Legal Notice */}
+            {}
             <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-xs text-yellow-800 space-y-1">
               <p>• <strong>Roll No:</strong> {userProfile.rollNumber || 'N/A'} &nbsp;&nbsp; <strong>Name:</strong> {userProfile.name} &nbsp;&nbsp; <strong>Semester:</strong> {semester}</p>
               <p>• Student will be allowed to appear in selected courses only. Without course selection, attendance will not be marked.</p>
               <p className="text-red-700">• Since the Examination Form is a legal document, over-writing or tampering in any way is illegal. It may result in rejection of the Examination Form outright or shall be prosecuted under Criminal Law, besides cancellation of admission.</p>
             </div>
 
-            {/* Available Courses Table */}
+            {}
             {courses.length > 0 && (
               <div>
                 <p className="text-xs text-yellow-800 bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-2 mb-3">
@@ -285,7 +284,7 @@ export default function CourseSelectionForm() {
               </div>
             )}
 
-            {/* Subject Selection */}
+            {}
             <div>
               <p className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">SELECT SUBJECT</p>
               <div className="flex gap-2">
@@ -301,7 +300,7 @@ export default function CourseSelectionForm() {
               </div>
             </div>
 
-            {/* Selected subjects list */}
+            {}
             {selectedSubjects.length > 0 && (
               <div>
                 <div className="overflow-x-auto rounded-xl border border-gray-200">

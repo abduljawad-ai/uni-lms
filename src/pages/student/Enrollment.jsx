@@ -1,4 +1,4 @@
-// src/pages/student/Enrollment.jsx
+
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { db } from '../../firebase/config'
@@ -40,7 +40,6 @@ export default function StudentEnrollment() {
         setDepartments(dSnap.docs.map(d => ({ id: d.id, ...d.data() })))
         setPrograms(pSnap.docs.map(d => ({ id: d.id, ...d.data() })))
 
-        // Try to load batches from settings, fallback to default list
         try {
           const bSnap = await getDoc(doc(db, 'settings', 'batches'))
           if (bSnap.exists()) setBatches(bSnap.data().list || defaultBatches())
@@ -60,8 +59,6 @@ export default function StudentEnrollment() {
   const defaultBatches = () =>
     ['2K19','2K20','2K21','2K22','2K23','2K24','2K25']
 
-  // Filter programs by selected department
-  // Tries both departmentId and deptId field names for compatibility
   const filteredPrograms = programs.filter(p =>
     p.departmentId === selectedDept || p.deptId === selectedDept
   )
@@ -76,7 +73,6 @@ export default function StudentEnrollment() {
       const prog = programs.find(p => p.id === selectedProgram)
       const dept = departments.find(d => d.id === selectedDept)
 
-      // 1. Create enrollment request document — status PENDING
       await addDoc(collection(db, 'enrollmentRequests'), {
         studentId:      userProfile.uid,
         studentName:    userProfile.displayName || userProfile.name,
@@ -94,10 +90,9 @@ export default function StudentEnrollment() {
         rejectionReason: null,
       })
 
-      // 2. Update user doc to PENDING — NO roll number, NO course access yet
       await updateDoc(doc(db, 'users', userProfile.uid), {
         enrollmentStatus: 'PENDING',
-        // Store selections so admin can see them
+
         departmentId:     selectedDept,
         departmentName:   dept?.name || selectedDept,
         programId:        selectedProgram,
@@ -107,7 +102,6 @@ export default function StudentEnrollment() {
         updatedAt:        serverTimestamp(),
       })
 
-      // 3. Refresh profile so UI updates immediately
       await refreshProfile()
 
       toast.success('Enrollment request submitted! Please wait for admin approval.')
@@ -125,7 +119,6 @@ export default function StudentEnrollment() {
     </div>
   )
 
-  // ── APPROVED STATE ─────────────────────────────────────────
   if (isApproved) return (
     <div className="space-y-6 animate-fade-in max-w-4xl">
       <div className="bg-[#1e3a5f] rounded-2xl p-5 text-white">
@@ -171,7 +164,6 @@ export default function StudentEnrollment() {
     </div>
   )
 
-  // ── PENDING STATE ──────────────────────────────────────────
   if (isPending) return (
     <div className="space-y-6 animate-fade-in max-w-4xl">
       <div className="bg-[#1e3a5f] rounded-2xl p-5 text-white">
@@ -212,7 +204,6 @@ export default function StudentEnrollment() {
     </div>
   )
 
-  // ── REJECTED STATE ─────────────────────────────────────────
   if (isRejected) return (
     <div className="space-y-6 animate-fade-in max-w-4xl">
       <div className="bg-[#1e3a5f] rounded-2xl p-5 text-white">
@@ -247,10 +238,9 @@ export default function StudentEnrollment() {
     </div>
   )
 
-  // ── NONE STATE — Show enrollment form ─────────────────────
   return (
     <div className="space-y-6 animate-fade-in max-w-4xl">
-      {/* Header */}
+      {}
       <div className="bg-[#1e3a5f] rounded-2xl p-5 text-white">
         <div className="flex items-center gap-3">
           <GraduationCap className="w-6 h-6 text-blue-300" />
@@ -272,7 +262,7 @@ export default function StudentEnrollment() {
         </div>
         <div className="p-6 space-y-6">
 
-          {/* Department */}
+          {}
           <div>
             <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
               <Building2 className="w-4 h-4 text-[#1e3a5f]" /> Select Department
@@ -377,7 +367,7 @@ export default function StudentEnrollment() {
             </div>
           )}
 
-          {/* Summary */}
+          {}
           {selectedDept && selectedProgram && selectedBatch && selectedYear && (
             <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
               <p className="text-sm font-semibold text-blue-800 mb-3">Enrollment Request Summary</p>
@@ -402,7 +392,7 @@ export default function StudentEnrollment() {
             </div>
           )}
 
-          {/* Submit */}
+          {}
           <button
             onClick={handleSubmitRequest}
             disabled={saving || !selectedDept || !selectedProgram || !selectedBatch || !selectedYear}

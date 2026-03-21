@@ -1,4 +1,4 @@
-// src/pages/student/Results.jsx
+
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { db } from '../../firebase/config'
@@ -62,7 +62,7 @@ export default function StudentResults() {
         <p className="text-red-500 text-xs mt-1">This is a digital notice board for display of department result only for students' information. It is not an officially announced result by controller office.</p>
       </div>
 
-      {/* Filter Panel */}
+      {}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
           <div>
@@ -90,7 +90,7 @@ export default function StudentResults() {
         </button>
       </div>
 
-      {/* Results Table */}
+      {}
       {searched && !loading && (
         results.length === 0 ? (
           <div className="bg-white rounded-2xl p-8 text-center border border-gray-100">
@@ -100,7 +100,7 @@ export default function StudentResults() {
           </div>
         ) : (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            {/* Header Info */}
+            {}
             <div className="bg-blue-50 border-b border-blue-100 p-4">
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-sm">
                 {[
@@ -118,7 +118,7 @@ export default function StudentResults() {
               </div>
             </div>
 
-            {/* Summary Stats */}
+            {}
             <div className="grid grid-cols-3 gap-4 p-4 border-b border-gray-100">
               <div className="text-center">
                 <p className="text-2xl font-bold text-[#1e3a5f]">{percentage}%</p>
@@ -136,7 +136,7 @@ export default function StudentResults() {
               </div>
             </div>
 
-            {/* Results Table */}
+            {}
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead><tr>

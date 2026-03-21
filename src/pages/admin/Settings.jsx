@@ -1,4 +1,4 @@
-// src/pages/admin/Settings.jsx
+
 import { useEffect, useState } from 'react'
 import { db } from '../../firebase/config'
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
@@ -151,7 +151,7 @@ export default function AdminSettings() {
         </div>
       ))}
 
-      {/* Maintenance Warning */}
+      {}
       {settings.maintenanceMode && (
         <div className="bg-red-50 border border-red-200 rounded-2xl p-4 text-red-800 text-sm">
           ⚠️ <strong>Maintenance Mode is ON.</strong> Students and teachers cannot access the portal. Only admins can log in.

@@ -1,9 +1,3 @@
-// src/contexts/AuthContext.jsx
-// ============================================================
-//  UniPortal — AuthContext  (v2 — Full Rewrite)
-//  Handles: auth state, role resolution, enrollment status,
-//  teacher approval, profile updates, password change
-// ============================================================
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import {
@@ -25,15 +19,13 @@ import {
 } from 'firebase/firestore';
 import { auth, db } from '../firebase/config';
 
-// ─── Enrollment states ────────────────────────────────────────
 export const ENROLLMENT_STATUS = {
-  NONE: 'NONE',      // Just registered, no application submitted
-  PENDING: 'PENDING',   // Application submitted, awaiting admin review
-  APPROVED: 'APPROVED',  // Verified — full student access
-  REJECTED: 'REJECTED',  // Rejected — can re-apply or contact admin
+  NONE: 'NONE',      
+  PENDING: 'PENDING',   
+  APPROVED: 'APPROVED',  
+  REJECTED: 'REJECTED',  
 };
 
-// ─── Context ──────────────────────────────────────────────────
 const AuthContext = createContext(null);
 
 export function useAuth() {
@@ -42,37 +34,29 @@ export function useAuth() {
   return ctx;
 }
 
-// ─── Provider ─────────────────────────────────────────────────
 export function AuthProvider({ children }) {
-  const [currentUser, setCurrentUser] = useState(null);  // Firebase Auth user
-  const [userProfile, setUserProfile] = useState(null);  // Firestore user doc
+  const [currentUser, setCurrentUser] = useState(null);  
+  const [userProfile, setUserProfile] = useState(null);  
   const [loading, setLoading] = useState(true);
 
-  // ── Derived convenience flags ──────────────────────────────
   const isAdmin = userProfile?.role === 'admin';
   const isTeacher = userProfile?.role === 'teacher';
   const isStudent = userProfile?.role === 'student';
 
-  // A teacher who has been approved by an admin
   const isApprovedTeacher = isTeacher && userProfile?.isApproved === true;
 
-  // A student whose enrollment was approved (= "real student")
   const isApprovedStudent =
     isStudent && userProfile?.enrollmentStatus === ENROLLMENT_STATUS.APPROVED;
 
-  // Student has submitted an application but it's still pending
   const isPendingStudent =
     isStudent && userProfile?.enrollmentStatus === ENROLLMENT_STATUS.PENDING;
 
-  // Student was rejected — they need to contact admin
   const isRejectedStudent =
     isStudent && userProfile?.enrollmentStatus === ENROLLMENT_STATUS.REJECTED;
 
-  // Student hasn't even applied yet
   const isUnenrolledStudent =
     isStudent && userProfile?.enrollmentStatus === ENROLLMENT_STATUS.NONE;
 
-  // ── Load user profile from Firestore ──────────────────────
   const loadProfile = useCallback(async (uid) => {
     const snap = await getDoc(doc(db, 'users', uid));
     if (snap.exists()) {
@@ -82,7 +66,6 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  // ── Auth state listener ────────────────────────────────────
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
@@ -96,8 +79,6 @@ export function AuthProvider({ children }) {
     return unsub;
   }, [loadProfile]);
 
-  // ── Register ───────────────────────────────────────────────
-  // role: 'student' | 'teacher'  (admin can never self-register)
   async function register({ email, password, displayName, role }) {
     if (role === 'admin') {
       throw new Error('Admin accounts cannot be self-registered.');
@@ -122,13 +103,13 @@ export function AuthProvider({ children }) {
     if (role === 'student') {
       roleDoc = {
         enrollmentStatus: ENROLLMENT_STATUS.NONE,
-        // These are null until enrollment is approved
+
         departmentId: null,
         departmentName: null,
         programId: null,
         programName: null,
         batchYear: null,
-        currentYear: null,      // 1 | 2 | 3 | 4
+        currentYear: null,      
         currentSemesterId: null,
         rollNumber: null,
         cgpa: null,
@@ -150,27 +131,21 @@ export function AuthProvider({ children }) {
     return cred.user;
   }
 
-  // ── Login ──────────────────────────────────────────────────
   async function login(email, password) {
     const cred = await signInWithEmailAndPassword(auth, email, password);
     await loadProfile(cred.user.uid);
     return cred.user;
   }
 
-  // ── Logout ─────────────────────────────────────────────────
   async function logout() {
     await signOut(auth);
     setUserProfile(null);
   }
 
-  // ── Forgot password ────────────────────────────────────────
   async function forgotPassword(email) {
     return sendPasswordResetEmail(auth, email);
   }
 
-  // ── Update own safe profile fields ────────────────────────
-  // Protected fields (role, enrollmentStatus, rollNumber, etc.)
-  // can never be updated through this function
   const PROTECTED = [
     'role', 'isApproved', 'enrollmentStatus',
     'rollNumber', 'departmentId', 'programId',
@@ -194,7 +169,6 @@ export function AuthProvider({ children }) {
     await loadProfile(currentUser.uid);
   }
 
-  // ── Change password (requires re-auth) ────────────────────
   async function changePassword(currentPassword, newPassword) {
     if (!currentUser) throw new Error('Not authenticated.');
 
@@ -203,19 +177,16 @@ export function AuthProvider({ children }) {
     await updatePassword(currentUser, newPassword);
   }
 
-  // ── Refresh profile (call after enrollment state changes) ──
   async function refreshProfile() {
     if (currentUser) await loadProfile(currentUser.uid);
   }
 
-  // ── Context value ──────────────────────────────────────────
   const value = {
-    // Auth state
+
     currentUser,
     userProfile,
     loading,
 
-    // Role flags
     isAdmin,
     isTeacher,
     isStudent,
@@ -225,7 +196,6 @@ export function AuthProvider({ children }) {
     isRejectedStudent,
     isUnenrolledStudent,
 
-    // Auth actions
     register,
     login,
     logout,

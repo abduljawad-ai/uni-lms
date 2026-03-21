@@ -1,6 +1,3 @@
-// src/firebase/config.js
-// ⚠️  Replace these values with your actual Firebase project credentials
-// Go to: https://console.firebase.google.com → Your Project → Project Settings → Web App
 
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
