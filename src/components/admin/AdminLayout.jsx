@@ -28,6 +28,7 @@ const navGroups = [
     items: [
       { to: '/admin/departments', label: 'Departments', icon: Building2 },
       { to: '/admin/courses', label: 'Courses', icon: BookOpen },
+      { to: '/admin/programs', label: 'Programs', icon: GraduationCap },
       { to: '/admin/batches', label: 'Batches', icon: Layers },
       { to: '/admin/enrollments', label: 'Enrollments', icon: ClipboardList },
       { to: '/admin/timetable', label: 'Timetable', icon: Clock },

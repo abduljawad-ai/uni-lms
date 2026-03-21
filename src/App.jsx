@@ -49,6 +49,7 @@ import AdminStudents from './pages/admin/Students'
 import AdminTeachers from './pages/admin/Teachers'
 import AdminDepartments from './pages/admin/Departments'
 import AdminCourses from './pages/admin/Courses'
+import AdminPrograms from './pages/admin/Programs'
 import AdminBatches from './pages/admin/Batches'
 import AdminEnrollments from './pages/admin/Enrollments'
 import AdminChallans from './pages/admin/Challans'
@@ -127,6 +128,7 @@ export default function App() {
         <Route path="teachers" element={<AdminTeachers />} />
         <Route path="departments" element={<AdminDepartments />} />
         <Route path="courses" element={<AdminCourses />} />
+        <Route path="/admin/programs" element={<AdminPrograms />} />
         <Route path="batches" element={<AdminBatches />} />
         <Route path="enrollments" element={<AdminEnrollments />} />
         <Route path="challans" element={<AdminChallans />} />
