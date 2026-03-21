@@ -64,6 +64,14 @@ const PrivateRoute = ({ children, allowedRoles }) => {
   const { currentUser, userProfile } = useAuth()
   if (!currentUser) return <Navigate to="/login" replace />
   if (allowedRoles && !allowedRoles.includes(userProfile?.role)) return <Navigate to="/login" replace />
+
+  // Students who are not approved can only access enrollment page
+  if (userProfile?.role === 'student' && userProfile?.enrollmentStatus !== 'APPROVED') {
+    const path = window.location.pathname
+    if (!path.includes('/student/enrollment')) {
+      return <Navigate to="/student/enrollment" replace />
+    }
+  }
   return children
 }
 
@@ -128,7 +136,7 @@ export default function App() {
         <Route path="teachers" element={<AdminTeachers />} />
         <Route path="departments" element={<AdminDepartments />} />
         <Route path="courses" element={<AdminCourses />} />
-        <Route path="/admin/programs" element={<AdminPrograms />} />
+        <Route path="programs" element={<AdminPrograms />} />
         <Route path="batches" element={<AdminBatches />} />
         <Route path="enrollments" element={<AdminEnrollments />} />
         <Route path="challans" element={<AdminChallans />} />

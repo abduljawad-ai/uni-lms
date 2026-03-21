@@ -58,8 +58,7 @@ export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const handleLogout = async () => { await logout(); toast.success('Logged out'); navigate('/login') }
-  const initials = userProfile?.name?.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2)||'AD'
-
+  const initials = (userProfile?.displayName || userProfile?.name || 'AD').split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2)
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
       <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#0d1f35] flex flex-col transform transition-transform duration-300 lg:relative lg:translate-x-0 ${sidebarOpen?'translate-x-0':'-translate-x-full'}`}>
@@ -82,7 +81,7 @@ export default function AdminLayout() {
               <span className="text-white font-bold text-sm">{initials}</span>
             </div>
             <div>
-              <p className="text-white text-sm font-semibold truncate">{userProfile?.name||'Admin'}</p>
+              <p className="text-white text-sm font-semibold truncate">{userProfile?.displayName || userProfile?.name || 'Admin'}</p>
               <p className="text-blue-400 text-xs">System Administrator</p>
             </div>
           </div>
@@ -125,7 +124,7 @@ export default function AdminLayout() {
             <div className="w-7 h-7 bg-[#0d1f35] rounded-full flex items-center justify-center">
               <span className="text-white text-xs font-bold">{initials}</span>
             </div>
-            <span className="text-sm font-medium text-gray-700 hidden sm:block">{userProfile?.name?.split(' ')[0]}</span>
+            <span className="text-sm font-medium text-gray-700 hidden sm:block">{(userProfile?.displayName || userProfile?.name || '').split(' ')[0]}</span>
           </div>
         </header>
         <main className="flex-1 overflow-y-auto p-4 md:p-6"><Outlet/></main>

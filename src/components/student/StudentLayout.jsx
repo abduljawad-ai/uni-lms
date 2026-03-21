@@ -68,7 +68,7 @@ export default function StudentLayout() {
     navigate('/login')
   }
 
-  const initials = userProfile?.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'ST'
+  const initials = (userProfile?.displayName || userProfile?.name || 'ST').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
@@ -99,9 +99,9 @@ export default function StudentLayout() {
                 : <span className="text-white font-bold text-sm">{initials}</span>}
             </div>
             <div className="overflow-hidden">
-              <p className="text-white text-sm font-semibold truncate">{userProfile?.name || 'Student'}</p>
+              <p className="text-white text-sm font-semibold truncate">{userProfile?.displayName || userProfile?.name || 'Student'}</p>
               <p className="text-blue-300 text-xs truncate">{userProfile?.rollNumber || userProfile?.email?.split('@')[0]}</p>
-              {userProfile?.program && <p className="text-blue-200 text-xs truncate">{userProfile.program}</p>}
+              {userProfile?.programName && <p className="text-blue-200 text-xs truncate">{userProfile.programName}</p>}
             </div>
           </div>
         </div>
@@ -149,8 +149,8 @@ export default function StudentLayout() {
               <h1 className="text-sm font-bold text-gray-800" style={{ fontFamily: 'Outfit, sans-serif' }}>
                 {userProfile?.universityName || 'University LMS'}
               </h1>
-              {userProfile?.batch && userProfile?.department && (
-                <p className="text-xs text-gray-400">{userProfile.batch} · {userProfile.department}</p>
+              {userProfile?.batchYear && userProfile?.departmentName && (
+                <p className="text-xs text-gray-400">{userProfile.batchYear} · {userProfile.departmentName}</p>
               )}
             </div>
           </div>
@@ -168,7 +168,7 @@ export default function StudentLayout() {
                   <span className="text-white text-xs font-bold">{initials}</span>
                 </div>
                 <span className="text-sm font-medium text-gray-700 hidden sm:block max-w-[100px] truncate">
-                  {userProfile?.name?.split(' ')[0]}
+                  {(userProfile?.displayName || userProfile?.name || '').split(' ')[0]}
                 </span>
                 <ChevronDown className="w-3 h-3 text-gray-400" />
               </button>

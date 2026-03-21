@@ -22,7 +22,7 @@ export default function TeacherLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const handleLogout = async () => { await logout(); toast.success('Logged out'); navigate('/login') }
-  const initials = userProfile?.name?.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2) || 'TC'
+  const initials = (userProfile?.displayName || userProfile?.name || 'TC').split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2)
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
@@ -46,7 +46,7 @@ export default function TeacherLayout() {
               <span className="text-white font-bold text-sm">{initials}</span>
             </div>
             <div>
-              <p className="text-white text-sm font-semibold truncate">{userProfile?.name}</p>
+              <p className="text-white text-sm font-semibold truncate">{userProfile?.displayName || userProfile?.name}</p>
               <p className="text-blue-300 text-xs">{userProfile?.designation || 'Lecturer'}</p>
               {!userProfile?.isApproved && (
                 <span className="text-yellow-400 text-xs font-medium">⏳ Pending Approval</span>
@@ -91,7 +91,7 @@ export default function TeacherLayout() {
             <div className="w-7 h-7 bg-[#1a2e4a] rounded-full flex items-center justify-center">
               <span className="text-white text-xs font-bold">{initials}</span>
             </div>
-            <span className="text-sm font-medium text-gray-700 hidden sm:block">{userProfile?.name?.split(' ')[0]}</span>
+            <span className="text-sm font-medium text-gray-700 hidden sm:block">{(userProfile?.displayName || userProfile?.name || '').split(' ')[0]}</span>
           </div>
         </header>
         <main className="flex-1 overflow-y-auto p-4 md:p-6"><Outlet/></main>
